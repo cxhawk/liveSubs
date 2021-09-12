@@ -23,9 +23,11 @@
           </el-col>
           <el-col>
             <div style="float: right">
-              <el-button :type="muted ? 'danger' : 'plain'" size="small" @click="mute">
-                MUTE
-              </el-button>
+              <el-tooltip content="Hide all contents on projection window (⌘+M)" placement="bottom" effect="light">
+                <el-button :type="muted ? 'danger' : 'plain'" size="small" @click="mute">
+                  MUTE
+                </el-button>
+              </el-tooltip>
             </div>
           </el-col>
         </el-row>

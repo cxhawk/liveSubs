@@ -2,7 +2,7 @@
   <div>
     <el-row :gutter="10" type="flex" justify="end">
       <el-col>
-        <span style="font-size: 15px">{{ currentEpisode.title }}</span>
+        <span style="font-size: 16px">{{ currentEpisode.title }}</span>
       </el-col>
       <el-col style="width: 110px">
         <el-button icon="el-icon-plus" size="small" @click="importLines"
@@ -17,6 +17,7 @@
         </el-popconfirm>
       </el-col>
     </el-row>
+    <span style="font-size: 12px; color: gray">Click to show a line, press ⌘ + ← or → to move around</span>
     <el-table
       :data="currentEpisode.lyrics"
       style="width: 100%; margin-top: 10px"
@@ -31,13 +32,13 @@
       <el-table-column prop="text" label="Text"> </el-table-column>
       <el-table-column fixed="right" label="Action" width="100">
         <template slot-scope="scope">
-          <el-button @click="insertLine(scope.row)" type="text" size="small" icon="el-icon-s-unfold"
+          <el-button @click="insertLine(scope.row, $event)" type="text" size="small" icon="el-icon-s-unfold"
             ></el-button
           >
-          <el-button @click="editLine(scope.row)" type="text" size="small" icon="el-icon-edit"
+          <el-button @click="editLine(scope.row, $event)" type="text" size="small" icon="el-icon-edit"
             ></el-button
           >
-          <el-button @click="removeLine(scope.row)" type="text" size="small" icon="el-icon-delete"
+          <el-button @click="removeLine(scope.row, $event)" type="text" size="small" icon="el-icon-delete"
             ></el-button
           >
         </template>
@@ -120,15 +121,24 @@ export default {
       this.currentEpisode.lyrics = [];
       this.$store.dispatch("save");
     },
-    removeLine(row) {
-      console.log(row);
+    removeLine(row, event) {
+      event.stopPropagation();
       const index = this.indexOfRow(row);
       if (index >= 0) {
         this.currentEpisode.lyrics.splice(index, 1);
         this.$store.dispatch("save");
       }
     },
-    insertLine(row) {
+    editLine(row, event) {
+      event.stopPropagation();
+      MessageBox.prompt("", "Edit", {inputValue: row.text}).then(response => {
+          const title = response.value;
+          row.text = title;
+          this.$store.dispatch("save");
+        });
+    },
+    insertLine(row, event) {
+      event.stopPropagation();
       const index = this.indexOfRow(row);
       if (index >= 0) {
         MessageBox.prompt("Add one line before", "Insert").then(response => {
