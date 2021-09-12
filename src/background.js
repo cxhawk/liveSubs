@@ -29,7 +29,7 @@ ipcMain.on("showProjection", (event, arg) => {
     if (process.env.WEBPACK_DEV_SERVER_URL) {
       projectionWindow.loadURL(process.env.WEBPACK_DEV_SERVER_URL + 'projection.html')
     } else {
-      win.loadURL('app://./projection.html')
+      projectionWindow.loadURL('app://./projection.html')
     }
     projectionWindow.on("ready-to-show", () => {
       for (const display of screen.getAllDisplays()) {
