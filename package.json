@@ -1,6 +1,8 @@
 {
   "name": "livesubs",
   "version": "1.0.0",
+  "description": "live subtitles on a chroma key",
+  "author": "hawk",
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
