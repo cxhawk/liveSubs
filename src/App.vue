@@ -100,6 +100,21 @@ export default {
       this.muted = arg;
     });
   },
+  mounted() {
+    window.onkeyup = e => {
+      if(e.keyCode == 32 || e.key === " ") {
+        this.$store.dispatch("nextSubtitle");
+        setTimeout(() => {
+          this.scrollToCurrentItem();
+        }, 100);
+      }
+    }
+    window.onkeydown = e => {
+      if(e.keyCode == 32 && e.target == document.body) {
+        e.preventDefault();
+      }
+    }
+  },
   methods: {
     addNewEpisode() {
       MessageBox.prompt("起个名字吧", "创建新节目").then(response => {
@@ -123,6 +138,12 @@ export default {
     },
     mute() {
       ipcRenderer.invoke("mute");
+    },
+    scrollToCurrentItem() {
+      const element = document.querySelector(".current-row");
+      if (element) {
+        element.scrollIntoView({behavior: "smooth", block: "center", inline: "nearest"});
+      }
     }
   }
 }
