@@ -6,21 +6,26 @@
           <el-col>
             <el-row type="flex" justify="start">
               <el-col style="width:60px">
-                <el-image style="width: 40px; height: 40px" src="favicon.ico"></el-image>
+                <el-image style="width: 40px; height: 40px" src="logo.png"></el-image>
               </el-col>
               <el-col>
                 <el-row>
-                  <span style="font-size: 20px;">抠像字幕</span>
+                  <span style="font-size: 20px;">Live Subs</span>
                 </el-row>
                 <el-row>
-                  <span style="font-size: 12px; font-weight:lighter;"></span>
+                  <span style="font-size: 14px; font-weight:lighter;">现场抠像字幕</span>
                 </el-row>
               </el-col>
             </el-row>
           </el-col>
+          <el-col class="preview" v-if="currentSubtitleText">
+            {{currentSubtitleText.text}}
+          </el-col>
           <el-col>
             <div style="float: right">
-              <el-button type="danger" size="small" @click="hideAll">Hide All</el-button>
+              <el-button :type="muted ? 'danger' : 'plain'" size="small" @click="mute">
+                MUTE
+              </el-button>
             </div>
           </el-col>
         </el-row>
@@ -65,6 +70,7 @@ export default {
   data() {
     return {
       openMenu: ['/episodes'],
+      muted: false
     }
   },
   computed: {
@@ -73,6 +79,13 @@ export default {
       'currentSubtitleEpisodeId',
       'currentSubtitleId',
     ]),
+    currentSubtitleText() {
+      const currentEpisode = this.episodes.find((ep) => ep.id === this.currentSubtitleEpisodeId);
+      if (currentEpisode) {
+        return currentEpisode.lyrics.find((element) => element.id === this.currentSubtitleId);
+      }
+      return null;
+    }
   },
   created() {
     ipcRenderer.on("nextSubtitle", () => {
@@ -80,6 +93,9 @@ export default {
     });
     ipcRenderer.on("previousSubtitle", () => {
       this.$store.dispatch("previousSubtitle");
+    });
+    ipcRenderer.on("muteStatus", (event, arg) => {
+      this.muted = arg;
     });
   },
   methods: {
@@ -103,8 +119,8 @@ export default {
     goToEpisodeInfo(episodeInfo) {
       this.$router.push("/episode/" + episodeInfo.id);
     },
-    hideAll() {
-      ipcRenderer.send("hideAll");
+    mute() {
+      ipcRenderer.invoke("mute");
     }
   }
 }
@@ -183,5 +199,15 @@ export default {
     font-size: 14px !important;
     overflow: hidden;
     text-overflow: ellipsis;
+  }
+  .preview {
+    text-align: center;
+    color: snow;
+    font-size: 17px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2; /* number of lines to show */
+    -webkit-box-orient: vertical;
   }
 </style>

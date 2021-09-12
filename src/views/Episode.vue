@@ -43,12 +43,12 @@
         </template>
       </el-table-column>
     </el-table>
-    <el-row style="margin-top: 15px" :gutter="10" type="flex">
-      <el-col>
-        <el-button size="small">Rename Subtitle</el-button>
+    <el-row style="margin-top: 15px" :gutter="10" type="flex" justify="end">
+      <el-col style="width: 90px">
+        <el-button size="small" @click="rename">Rename</el-button>
       </el-col>
-      <el-col>
-        <el-button type="danger" size="small">Delete Subtitle</el-button>
+      <el-col style="width: 90px">
+        <el-button type="danger" size="small" @click="deleteEpisode">Delete</el-button>
       </el-col>
     </el-row>
     <el-dialog title="Import Lines" :visible.sync="importDialogVisible" width="70%">
@@ -73,6 +73,7 @@
 <script>
 import { mapFields } from "vuex-map-fields";
 import { nanoid } from 'nanoid';
+import { MessageBox } from 'element-ui';
 
 export default {
   data() {
@@ -130,8 +131,16 @@ export default {
     insertLine(row) {
       const index = this.indexOfRow(row);
       if (index >= 0) {
-        
-        this.$store.dispatch("save");
+        MessageBox.prompt("Add one line before", "Insert").then(response => {
+          const text = response.value;
+          const identifier = nanoid();
+          const lyric = {
+            id: identifier,
+            text: text
+          };
+          this.currentEpisode.lyrics.splice(index, 0, lyric);
+          this.$store.dispatch("save");
+        });
       }
     },
     indexOfRow(row) {
@@ -142,6 +151,22 @@ export default {
     currentChanged(row) {
       this.$store.dispatch("showSubtitle", {episodeId: this.$route.params.id, lyricsId: row.id});
     },
+    rename() {
+      MessageBox.prompt("a new name for this subtitle?", "Rename", {inputValue: this.currentEpisode.title}).then(response => {
+          const title = response.value;
+          this.currentEpisode.title = title;
+          this.$store.dispatch("save");
+        });
+    },
+    deleteEpisode() {
+      MessageBox.confirm("Are you sure to delete this subtitle?", "Confirm").then(() => {
+        const index = this.episodes.indexOf(this.currentEpisode);
+        if (index>=0) {
+          this.$router.push("/");
+          this.episodes.splice(index, 1);
+        }
+      });
+    }
   },
 };
 </script>

@@ -18,7 +18,7 @@ export default new Vuex.Store({
     // Add the `getField` getter to the
     // `getters` of your Vuex store instance.
     getField,
-    currentSubtitle: (state) => {
+    currentSubtitle: state => {
       const currentEpisode = state.episodes.find((ep) => ep.id === state.currentSubtitleEpisodeId);
       if (currentEpisode) {
         return currentEpisode.lyrics.find((element) => element.id === state.currentSubtitleId);

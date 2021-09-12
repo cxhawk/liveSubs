@@ -8,6 +8,8 @@ const isDevelopment = process.env.NODE_ENV !== 'production'
 let mainWindow = null
 let projectionWindow = null
 let hideAllCSSKey = null
+let muted = false
+let currentSubtitle = ""
 
 // Scheme must be registered before the app is ready
 protocol.registerSchemesAsPrivileged([
@@ -42,6 +44,13 @@ ipcMain.on("showProjection", (event, arg) => {
           }
         }
       }
+      // restore states
+      if (muted && !hideAllCSSKey) {
+        toggleHideAll()
+      }
+      if (currentSubtitle) {
+        showSubtitle(currentSubtitle)
+      }
       projectionWindow.show()
     })
   } else {
@@ -49,21 +58,35 @@ ipcMain.on("showProjection", (event, arg) => {
   }
 })
 
-ipcMain.on("hideAll", async () => {
+ipcMain.handle("mute", () => {
+  return toggleHideAll()
+})
+
+async function toggleHideAll() {
   if (projectionWindow) {
     if (hideAllCSSKey) {
       projectionWindow.webContents.removeInsertedCSS(hideAllCSSKey)
       hideAllCSSKey = null
+      muted = false
     } else {
       hideAllCSSKey = await projectionWindow.webContents.insertCSS("body {display: none}")
+      muted = true
     }
+  } else {
+    muted = !muted;
   }
-})
+  mainWindow.webContents.send("muteStatus", muted);
+}
+
+async function showSubtitle(item) {
+  if (projectionWindow) {
+    projectionWindow.webContents.send("showSubtitle", item)
+  }
+  currentSubtitle = item
+}
 
 ipcMain.on("showSubtitle", (event, arg) => {
-  if (projectionWindow) {
-    projectionWindow.webContents.send("showSubtitle", arg)
-  }
+  showSubtitle(arg)
 })
 
 ipcMain.on("updateSettings", (event, arg) => {
@@ -129,6 +152,9 @@ app.on('ready', async () => {
   })
   globalShortcut.register('CommandOrControl+Left', () => {
     mainWindow.webContents.send("previousSubtitle")
+  })
+  globalShortcut.register('CommandOrControl+M', () => {
+    toggleHideAll()
   })
   createWindow()
 })
