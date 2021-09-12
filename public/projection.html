@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
+    />
+    <style>
+      body {
+        margin: 0;
+        overflow: hidden;
+        cursor: none;
+      }
+      .container {
+        display: flex;
+        flex-direction: column;
+        justify-content: end;
+        align-items: center;
+        height: 100vh;
+      }
+      .top {
+        flex-grow: 4;
+      }
+      .bottom {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 15%;
+        width: 100%;
+        font-family: "Helvetica Neue",Helvetica,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","微软雅黑",Arial,sans-serif;
+      }
+      .lyrics {
+        text-align: center;
+        max-width: 80%;
+        color: whitesmoke;
+        font-size: 45px;
+        text-overflow: ellipsis;
+        -webkit-text-stroke: 1px black;
+        font-weight: bold;
+        overflow: hidden;
+        display: -webkit-box;
+        -webkit-line-clamp: 2; /* number of lines to show */
+        -webkit-box-orient: vertical;
+      }
+    </style>
+    <script type="text/javascript">
+      window.onload = function() {
+        const { ipcRenderer } = window.require('electron');
+        document.body.addEventListener('dblclick', () => {
+          if (document.fullscreenElement) {
+            document.exitFullscreen();
+          } else {
+            document.documentElement.requestFullscreen();
+          }
+        }, true);
+        ipcRenderer.on("showSubtitle", (event, arg) => {
+          const element = document.getElementById("subtitle");
+          if (arg) {
+            element.innerHTML = arg.text;
+            animateCSS(element, "fadeIn");
+          } else {
+            element.innerHTML = "";
+          }
+        });
+        const animateCSS = (element, animation, prefix = 'animate__') =>
+          // We create a Promise and return it
+          new Promise((resolve, reject) => {
+            const animationName = `${prefix}${animation}`;
+            const node = element;
+
+            node.removeEventListener('animationend', handleAnimationEnd);
+            node.classList.add(`${prefix}animated`, animationName);
+
+            // When the animation ends, we clean the classes and resolve the Promise
+            function handleAnimationEnd(event) {
+              event.stopPropagation();
+              node.classList.remove(`${prefix}animated`, animationName);
+              resolve('Animation ended');
+            }
+
+            node.addEventListener('animationend', handleAnimationEnd, {once: true});
+          });
+      }
+    </script>
+    <title>Projection Window (double click to toggle fullscreen)</title>
+  </head>
+  <body>
+    <div class="container">
+      <div class="top"></div>
+      <div class="bottom">
+        <div class="lyrics" id="subtitle">
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
