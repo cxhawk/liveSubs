@@ -17,7 +17,7 @@
         </el-popconfirm>
       </el-col>
     </el-row>
-    <span style="font-size: 12px; color: gray">Click to show a line, press ⌘ + ← or → to move around</span>
+    <span style="font-size: 12px; color: gray">Click to show a line, press spacebar go next or ⌘ + ←/→ to move around</span>
     <el-table
       :data="currentEpisode.lyrics"
       style="width: 100%; margin-top: 10px"

@@ -8,8 +8,12 @@ Vue.use(Vuex)
 export default new Vuex.Store({
   state: {
     episodes: localStorage.getItem("episodes") ? JSON.parse(localStorage.getItem("episodes")) : [],
-    settings: {
-      backgroundColor: localStorage.getItem("backgroundColor") ? localStorage.getItem("backgroundColor") : "#009933",
+    settings: localStorage.getItem("settings") ? JSON.parse(localStorage.getItem("settings")) : {
+      backgroundColor: "#009933",
+      fontFamily: "PingFang SC",
+      fontSize: 50,
+      fontWeight: "bolder",
+      color: "#FFFFFF"
     },
     currentSubtitleEpisodeId: null,
     currentSubtitleId: null
@@ -34,7 +38,7 @@ export default new Vuex.Store({
       localStorage.setItem("episodes", JSON.stringify(context.state.episodes));
     },
     updateSettings(context) {
-      localStorage.setItem("settings", context.state.settings);
+      localStorage.setItem("settings", JSON.stringify(context.state.settings));
       ipcRenderer.send("updateSettings", context.state.settings);
     },
     showSubtitle(context, {episodeId, lyricsId}) {
