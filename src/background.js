@@ -92,15 +92,15 @@ ipcMain.on("showSubtitle", (event, arg) => {
 
 ipcMain.on("updateSettings", (event, arg) => {
   if (projectionWindow) {
-    projectionWindow.getBrowserView().setBackgroundColor(arg.backgroundColor)
-    projectionWindow.webContents.send("updateSettings", arg);
+    projectionWindow.setBackgroundColor(arg.backgroundColor)
+    projectionWindow.webContents.send("updateSettings", arg)
   }
 })
 
 ipcMain.on("nextSubtitle", () => {
   // from projection.html to vue
   if (mainWindow) {
-    mainWindow.webContents.send("nextSubtitle");
+    mainWindow.webContents.send("nextSubtitle")
   }
 })
 
