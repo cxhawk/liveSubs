@@ -37,7 +37,6 @@
         font-weight: normal;
         text-overflow: ellipsis;
         -webkit-text-stroke: 2px black;
-        overflow: hidden;
         display: -webkit-box;
         -webkit-line-clamp: 2; /* number of lines to show */
         -webkit-box-orient: vertical;
@@ -71,10 +70,17 @@
           }
         });
         ipcRenderer.on("updateSettings", (event, arg) => {
-          element.style.fontFamily = arg.fontFamily;
+          element.style.fontFamily = arg.fontFamily + ",'PingFang SC', 'Microsoft YaHei', '微软雅黑', Arial, sans-serif";
           element.style.fontSize = arg.fontSize;
           element.style.fontWeight = arg.fontWeight;
           element.style.color = arg.color;
+          element.style.webkitTextStrokeColor = arg.strokeColor;
+          element.style.webkitTextStrokeWidth = arg.strokeSize + "px";
+          if (arg.addShadow) {
+            element.style.textShadow = arg.strokeSize + "px " + arg.strokeSize + "px " + arg.strokeColor;
+          } else {
+            element.style.textShadow = "none";
+          }
         });
 
         const animateCSS = (element, animation, prefix = 'animate__') =>

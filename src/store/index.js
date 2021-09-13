@@ -13,7 +13,10 @@ export default new Vuex.Store({
       fontFamily: "PingFang SC",
       fontSize: 50,
       fontWeight: "bolder",
-      color: "#FFFFFF"
+      color: "#FFFFFF",
+      strokeColor: "#000000",
+      strokeSize: 2,
+      addShadow: false
     },
     currentSubtitleEpisodeId: null,
     currentSubtitleId: null

@@ -1,6 +1,9 @@
 <template>
   <div>
     <el-form label-position="right" label-width="130px">
+      <el-form-item>
+        <el-button @click="showProjection">Open Projection Window</el-button>
+      </el-form-item>
       <el-form-item label="Background Color">
         <el-color-picker v-model="settings.backgroundColor" :predefine="['#009933', '#00FF00']" @change="update"></el-color-picker>
       </el-form-item>
@@ -20,8 +23,14 @@
       <el-form-item label="Text Color">
         <el-color-picker v-model="settings.color" :predefine="['#FFFFFF']" @change="update"></el-color-picker>
       </el-form-item>
-      <el-form-item>
-        <el-button @click="showProjection">Open Projection Window</el-button>
+      <el-form-item label="Stroke Color">
+        <el-color-picker v-model="settings.strokeColor" :predefine="['#000000']" @change="update"></el-color-picker>
+      </el-form-item>
+      <el-form-item label="Stroke Size">
+        <el-input-number v-model="settings.strokeSize" @change="update" :min="0" :max="5"></el-input-number>
+      </el-form-item>
+      <el-form-item label="Add Shadow">
+        <el-switch v-model="settings.addShadow" @change="update"></el-switch>
       </el-form-item>
     </el-form>
   </div>
