@@ -92,6 +92,7 @@ ipcMain.on("showSubtitle", (event, arg) => {
 
 ipcMain.on("updateSettings", (event, arg) => {
   if (projectionWindow) {
+    console.log(arg)
     projectionWindow.setBackgroundColor(arg.backgroundColor)
     projectionWindow.webContents.send("updateSettings", arg)
   }

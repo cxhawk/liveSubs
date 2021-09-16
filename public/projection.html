@@ -9,6 +9,7 @@
         margin: 0;
         overflow: hidden;
         cursor: none;
+        font-family: "Noto Sans", "Noto Sans SC", sans-serif;
       }
       .container {
         display: flex;
@@ -20,20 +21,18 @@
       .top {
         flex-grow: 4;
       }
-      .bottom {
+      #lyrics {
         display: flex;
         justify-content: center;
         align-items: center;
         height: 15%;
         width: 100%;
-        font-family: "Helvetica Neue",Helvetica,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","微软雅黑",Arial,sans-serif;
       }
-      .lyrics {
+      #subtitle {
         text-align: center;
         max-width: 80%;
         color: whitesmoke;
         font-size: 50px;
-        font-smooth: always;
         font-weight: normal;
         text-overflow: ellipsis;
         -webkit-text-stroke: 2px black;
@@ -70,8 +69,9 @@
           }
         });
         ipcRenderer.on("updateSettings", (event, arg) => {
-          element.style.fontFamily = arg.fontFamily + ",'PingFang SC', 'Microsoft YaHei', '微软雅黑', Arial, sans-serif";
-          element.style.fontSize = arg.fontSize;
+          console.log(arg);
+          //element.style.fontFamily = arg.fontFamily + ",'PingFang SC', 'Microsoft YaHei', '微软雅黑', Arial, sans-serif";
+          element.style.fontSize = arg.fontSize + "px";
           element.style.fontWeight = arg.fontWeight;
           element.style.color = arg.color;
           element.style.webkitTextStrokeColor = arg.strokeColor;
@@ -108,8 +108,8 @@
   <body>
     <div class="container">
       <div class="top"></div>
-      <div class="bottom">
-        <div class="lyrics" id="subtitle">
+      <div id="lyrics">
+        <div id="subtitle">
         </div>
       </div>
     </div>

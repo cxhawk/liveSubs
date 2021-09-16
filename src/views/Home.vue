@@ -14,10 +14,11 @@
         <el-input-number v-model="settings.fontSize" @change="update" :min="10" :max="100"></el-input-number>
       </el-form-item>
       <el-form-item label="Weight">
-        <el-select v-model="settings.fontWeight">
-          <el-option label="light" value="lighter"></el-option>
-          <el-option label="normal" value="normal"></el-option>
-          <el-option label="bold" value="bolder"></el-option>
+        <el-select v-model="settings.fontWeight" @change="update">
+          <el-option label="light" value="300"></el-option>
+          <el-option label="normal" value="400"></el-option>
+          <el-option label="bold" value="700"></el-option>
+          <el-option label="black" value="900"></el-option>
         </el-select>
       </el-form-item>
       <el-form-item label="Text Color">

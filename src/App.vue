@@ -10,10 +10,10 @@
               </el-col>
               <el-col>
                 <el-row>
-                  <span style="font-size: 20px;">Live Subs</span>
+                  <span style="font-size: 20px; font-weight:700;">Live Subs</span>
                 </el-row>
                 <el-row>
-                  <span style="font-size: 14px; font-weight:lighter;">现场抠像字幕</span>
+                  <span style="font-size: 14px; font-weight:300;">现场抠像字幕</span>
                 </el-row>
               </el-col>
             </el-row>
@@ -92,9 +92,11 @@ export default {
   created() {
     ipcRenderer.on("nextSubtitle", () => {
       this.$store.dispatch("nextSubtitle");
+      this.scrollToCurrentItem();
     });
     ipcRenderer.on("previousSubtitle", () => {
       this.$store.dispatch("previousSubtitle");
+      this.scrollToCurrentItem();
     });
     ipcRenderer.on("muteStatus", (event, arg) => {
       this.muted = arg;
@@ -104,9 +106,7 @@ export default {
     window.onkeyup = e => {
       if(e.keyCode == 32 || e.key === " ") {
         this.$store.dispatch("nextSubtitle");
-        setTimeout(() => {
-          this.scrollToCurrentItem();
-        }, 100);
+        this.scrollToCurrentItem();
       }
     }
     window.onkeydown = e => {
@@ -117,7 +117,7 @@ export default {
   },
   methods: {
     addNewEpisode() {
-      MessageBox.prompt("起个名字吧", "创建新节目").then(response => {
+      MessageBox.prompt("Give it a name", "New Episode").then(response => {
         const name = response.value;
         const identifier = nanoid();
         const episode = {
@@ -140,10 +140,12 @@ export default {
       ipcRenderer.invoke("mute");
     },
     scrollToCurrentItem() {
-      const element = document.querySelector(".current-row");
-      if (element) {
-        element.scrollIntoView({behavior: "smooth", block: "center", inline: "nearest"});
-      }
+      setTimeout(() => {
+        const element = document.querySelector(".current-row");
+        if (element) {
+          element.scrollIntoView({behavior: "smooth", block: "center", inline: "nearest"});
+        }
+      }, 100);
     }
   }
 }
@@ -152,6 +154,7 @@ export default {
 <style>
   :root {
     --left-width: 250px;
+    --top-height: 60px;
   }
   @media only screen and (max-width: 650px) {
     :root {
@@ -176,6 +179,55 @@ export default {
       border-radius: 10px;
       background: rgba(0,0,0,0.5); 
   }
+
+  @font-face {
+    font-family: "Noto Sans SC";
+    font-weight: 300;
+    font-display: auto;
+    src: url("./assets/fonts/NotoSansSC-Light.otf");
+  }
+  @font-face {
+    font-family: "Noto Sans SC";
+    font-weight: 400;
+    font-display: auto;
+    src: url("./assets/fonts/NotoSansSC-Regular.otf");
+  }
+  @font-face {
+    font-family: "Noto Sans SC";
+    font-weight: 700;
+    font-display: auto;
+    src: url("./assets/fonts/NotoSansSC-Bold.otf");
+  }
+  @font-face {
+    font-family: "Noto Sans SC";
+    font-weight: 900;
+    font-display: auto;
+    src: url("./assets/fonts/NotoSansSC-Black.otf");
+  }
+  @font-face {
+    font-family: "Noto Sans";
+    font-weight: 300;
+    font-display: auto;
+    src: url("./assets/fonts/NotoSans-Light.ttf");
+  }
+  @font-face {
+    font-family: "Noto Sans";
+    font-weight: 400;
+    font-display: auto;
+    src: url("./assets/fonts/NotoSans-Regular.ttf");
+  }
+  @font-face {
+    font-family: "Noto Sans";
+    font-weight: 700;
+    font-display: auto;
+    src: url("./assets/fonts/NotoSans-Bold.ttf");
+  }
+  @font-face {
+    font-family: "Noto Sans";
+    font-weight: 900;
+    font-display: auto;
+    src: url("./assets/fonts/NotoSans-Black.ttf");
+  }
   
   body {
     margin: 0;
@@ -183,21 +235,22 @@ export default {
     position: fixed;
     overflow: hidden;
     overscroll-behavior-y: none;
-    font-family: "Helvetica Neue",Helvetica,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","微软雅黑",Arial,sans-serif;
+    font-family: "helvetica", "Noto Sans", "Noto Sans SC", sans-serif;
   }
   .top {
     background-color: #272f3f;
     color: white;
+    height: var(--top-height) !important;;
   }
   .left {
     background-color: #1e222d;
-    height: calc(100vh - 60px);
+    height: calc(100vh - var(--top-height));
     width: var(--left-width) !important;
   }
   .main {
     background-color: #E9EEF3;
     color: #333;
-    height: calc(100vh - 60px);
+    height: calc(100vh - var(--top-height));
   }
   .el-menu {
     border: 0px !important;
@@ -226,9 +279,9 @@ export default {
   .preview {
     text-align: center;
     color: snow;
+    font-family: "Noto Sans", "Noto Sans SC";
     font-size: 17px;
     text-overflow: ellipsis;
-    overflow: hidden;
     display: -webkit-box;
     -webkit-line-clamp: 2; /* number of lines to show */
     -webkit-box-orient: vertical;
