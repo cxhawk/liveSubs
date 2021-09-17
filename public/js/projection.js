@@ -56,10 +56,9 @@ window.onload = function () {
 		if (arg && arg.title) {
 			console.log("showLowerThird");
 			lowerThirdHeader.text = arg.title;
-			if (arg.description) {
-				lowerThirdDescription.text = arg.description;
-			}
+			lowerThirdDescription.text = arg.description;
 			lowerThird.visible = true;
+			lowerThird.alpha = 0;
 			lowerThirdAnimating = true;
 			layout();
 		} else {
@@ -110,7 +109,11 @@ function initPIXI() {
 	app.stage.addChild(subtitle);
 	app.ticker.add((elapsedMS) => {
 		if (lowerThirdAnimating) {
-
+			lowerThird.alpha += 0.05;
+			if (lowerThird.alpha >= 1) {
+				lowerThird.alpha = 1;
+				lowerThirdAnimating = false;
+			}
 		}
 	});
 	
@@ -169,19 +172,31 @@ function layout() {
 	}
 
 	if (lowerThirdBg1) {
-		const metricsHeader = PIXI.TextMetrics.measureText(lowerThirdHeader.text, lowerThirdHeader.style);
-		const metricsDescription = PIXI.TextMetrics.measureText(lowerThirdDescription.text, lowerThirdDescription.style);
-		lowerThirdBg1.x = 0;
-		lowerThirdBg2.x = lowerThirdBg1.width;
-		lowerThirdBg2.width = Math.max(metricsHeader.width, metricsDescription.width) + lowerThirdHeader.x + 20 - lowerThirdBg1.width - lowerThirdBg3.width;
-		lowerThirdBg3.x = lowerThirdBg1.width + lowerThirdBg2.width;
-
 		lowerThirdHeader.x = settings.lowerThirdTitleX;
 		lowerThirdHeader.y = settings.lowerThirdTitleY;
 		lowerThirdDescription.x = settings.lowerThirdDescriptionX;
 		lowerThirdDescription.y = settings.lowerThirdDescriptionY;
-		lowerThird.x = 20;
-		lowerThird.y = h - (lowerThirdTexture.height + 30);
+
+		const metricsHeader = PIXI.TextMetrics.measureText(lowerThirdHeader.text, lowerThirdHeader.style);
+		const metricsDescription = PIXI.TextMetrics.measureText(lowerThirdDescription.text, lowerThirdDescription.style);
+		lowerThirdBg1.x = 0;
+		lowerThirdBg2.x = lowerThirdBg1.width;
+		let middleWidth = Math.max(metricsHeader.width, metricsDescription.width) + lowerThirdHeader.x + 20 - lowerThirdBg1.width - lowerThirdBg3.width;
+		if (middleWidth < 0) {
+			middleWidth = 0;
+		}
+		
+		lowerThirdBg2.width = middleWidth;
+		lowerThirdBg3.x = lowerThirdBg1.width + lowerThirdBg2.width;
+		// console.log("lowerThirdBg1.width " + lowerThirdBg1.width);
+		// console.log("lowerThirdBg3.width " + lowerThirdBg3.width);
+		// console.log("lowerThirdHeader.x " + lowerThirdHeader.x);
+		// console.log("mw:" + middleWidth);
+		// console.log(metricsHeader.width + " " + metricsDescription.width);
+		// console.log(lowerThirdBg1.width + "/" + lowerThirdBg2.width + "/" + lowerThirdBg3.x);
+		
+		lowerThird.x = 50;
+		lowerThird.y = h - (lowerThirdTexture.height + 50);
 	}
 }
 

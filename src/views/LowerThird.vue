@@ -63,19 +63,39 @@
         >
       </span>
     </el-dialog>
+		<el-dialog title="Item" :visible.sync="editingItem" width="70%" v-if="editingItem">
+      <el-input
+        placeholder="title"
+        v-model="editingItem.title"
+      ></el-input>
+			<el-input
+				type="textarea"
+        placeholder="description"
+        v-model="editingItem.description"
+      ></el-input>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="editingItem = null" size="small"
+          >Cancel</el-button
+        >
+        <el-button type="primary" @click="editConfirm" size="small"
+          >Confirm</el-button
+        >
+      </span>
+    </el-dialog>
   </div>
 </template>
 
 <script>
 import { mapFields } from "vuex-map-fields";
 import { nanoid } from 'nanoid';
-import { MessageBox } from 'element-ui';
 
 export default {
   data() {
     return {
       importDialogVisible: false,
       importText: "",
+			editingItem: null,
+			insertingIndex: 0
     };
   },
   computed: {
@@ -120,28 +140,26 @@ export default {
     },
     editLine(row, event) {
       event.stopPropagation();
-      MessageBox.prompt("", "Edit", {inputValue: row.title}).then(response => {
-          const title = response.value;
-          row.title = title;
-          this.$store.dispatch("save");
-        });
+			this.editingItem = row;
     },
     insertLine(row, event) {
       event.stopPropagation();
       const index = this.indexOfRow(row);
       if (index >= 0) {
-        MessageBox.prompt("Add one line before", "Insert").then(response => {
-          const text = response.value;
-          const identifier = nanoid();
-          const item = {
-            id: identifier,
-            title: text
-          };
-          this.lowerThirds.splice(index, 0, item);
-          this.$store.dispatch("save");
-        });
+				this.insertingIndex = index;
+				this.editingItem = {
+					id: nanoid()
+				};
       }
     },
+		editConfirm() {
+			if (this.lowerThirds.includes(this.editingItem) === false) {
+				this.lowerThirds.splice(this.insertingIndex, 0, this.editingItem);
+				this.insertingIndex = 0;
+			}
+			this.$store.dispatch("save");
+			this.editingItem = null;
+		},
     indexOfRow(row) {
       return this.lowerThirds.findIndex((element) => {
         return (element.id === row.id);
