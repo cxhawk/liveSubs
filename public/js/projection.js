@@ -1,6 +1,3 @@
-const PIXI = require('pixi.js');
-
-PIXI.settings.ROUND_PIXELS = true;
 let app = new PIXI.Application({
 	width: 1920, height: 1080, backgroundAlpha: 0, resolution: 1, resizeTo: window
 });
