@@ -1,5 +1,9 @@
 # Live Subtitles and Lower Third
 
+Wanna add live subtitles and lower third easily on your live stream? This tool is great to be used with a video switcher like the ATEM MINIs.
+
+## Screenshots
+
 setup subtitle and lower third format
 <img width="1136" alt="Screen Shot 2021-09-17 at 2 53 24 PM" src="https://user-images.githubusercontent.com/14524765/133857593-6edbcd7d-75c1-4c57-b364-6d0bba375568.png">
 
