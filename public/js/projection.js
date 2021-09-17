@@ -91,7 +91,7 @@ window.onload = function () {
 			fontFamily: '"Noto Sans", "Noto Sans SC", sans-serif', 
 			fontSize: arg.lowerThirdTitleFontSize,
 			fontWeight: 700,
-			fill: arg.lowerThirdTitleFontColor, 
+			fill: arg.lowerThirdTitleColor, 
 		};
 		lowerThirdDescription.style = {
 			fontFamily: '"Noto Sans", "Noto Sans SC", sans-serif', 
@@ -104,9 +104,6 @@ window.onload = function () {
 }
 
 function initPIXI() {
-	const textStyle = new PIXI.TextStyle({
-		fontFamily: '"Noto Sans", "Noto Sans SC", sans-serif', fontSize: 40, fill: '0xFFFFFF', align: 'center'
-	});
 	app.stage.addChild(subtitle);
 	app.ticker.add(() => {
 		if (lowerThirdAnimation.animating) {
