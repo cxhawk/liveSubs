@@ -2,9 +2,11 @@
   <div>
     <el-row :gutter="10" type="flex" justify="end">
       <el-col>
-        <el-button icon="el-icon-close" size="small" type="danger" @click="clear" :disabled="currentLowerThirdId === null"
-          >Clear
-        </el-button>
+        <el-tooltip content="deactivate lower third (⌘+1)" placement="bottom" effect="light">
+          <el-button icon="el-icon-close" size="small" type="danger" @click="clear" :disabled="currentLowerThirdId === null"
+            >Clear
+          </el-button>
+        </el-tooltip>
       </el-col>
       <el-col style="width: 110px">
         <el-button icon="el-icon-plus" size="small" @click="importLines"
@@ -19,7 +21,6 @@
         </el-popconfirm>
       </el-col>
     </el-row>
-    <span style="font-size: 12px; color: gray">Click to show a line, press spacebar go next or ⌘ + ←/→ to move around</span>
     <el-table
       :data="lowerThirds"
       style="width: 100%; margin-top: 10px"
@@ -47,11 +48,11 @@
         </template>
       </el-table-column>
     </el-table>
-    <el-dialog title="Import Lines" :visible.sync="importDialogVisible" width="70%">
+    <el-dialog title="Import Lower Third" :visible.sync="importDialogVisible" width="70%">
       <el-input
         type="textarea"
         :autosize="{ minRows: 5, maxRows: 20 }"
-        placeholder="one line per item"
+        placeholder="one line per title|description"
         v-model="importText"
       ></el-input>
       <span slot="footer" class="dialog-footer">
@@ -63,7 +64,7 @@
         >
       </span>
     </el-dialog>
-		<el-dialog title="Item" :visible.sync="editingItem" width="70%" v-if="editingItem">
+		<el-dialog title="Item" :visible.sync="isEditing" width="70%" v-if="isEditing">
       <el-input
         placeholder="title"
         v-model="editingItem.title"
@@ -103,6 +104,9 @@ export default {
       "lowerThirds",
       "currentLowerThirdId",
     ]),
+    isEditing() {
+      return this.editingItem != null;
+    }
   },
   methods: {
 		clear() {
@@ -118,7 +122,12 @@ export default {
         if (lines.length) {
           let newItems = [];
           for (const line of lines) {
-            newItems.push({ id: nanoid(), title: line });
+            const elements = line.split("|");
+            if (elements.length >= 2) {
+              newItems.push({ id: nanoid(), title: elements[0], description: elements[1] });
+            } else {
+              newItems.push({ id: nanoid(), title: line});
+            }
           }
           this.lowerThirds = this.lowerThirds.concat(newItems);
           this.$store.dispatch("save");
@@ -134,6 +143,9 @@ export default {
       event.stopPropagation();
       const index = this.indexOfRow(row);
       if (index >= 0) {
+        if (row.id === this.currentLowerThirdId) {
+          this.clear();
+        }
         this.lowerThirds.splice(index, 1);
         this.$store.dispatch("save");
       }
@@ -157,6 +169,7 @@ export default {
 				this.lowerThirds.splice(this.insertingIndex, 0, this.editingItem);
 				this.insertingIndex = 0;
 			}
+      this.$store.dispatch("showLowerThird", this.currentLowerThirdId); // update in case text changed
 			this.$store.dispatch("save");
 			this.editingItem = null;
 		},

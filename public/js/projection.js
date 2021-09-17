@@ -10,7 +10,7 @@ let lowerThirdHeader = new PIXI.Text();
 let lowerThirdDescription = new PIXI.Text();
 let lowerThirdTexture = null;
 let lowerThirdBg1 = null, lowerThirdBg2 = null, lowerThirdBg3 = null;
-let lowerThirdAnimating = false
+let lowerThirdAnimation = {animating: false, startTime: 0};
 let settings = {
 	backgroundColor: "#009933",
 	// subtitle settings
@@ -59,7 +59,8 @@ window.onload = function () {
 			lowerThirdDescription.text = arg.description;
 			lowerThird.visible = true;
 			lowerThird.alpha = 0;
-			lowerThirdAnimating = true;
+			lowerThirdAnimation.animating = true;
+			lowerThirdAnimation.startTime = performance.now();
 			layout();
 		} else {
 			console.log("hide showLowerThird");
@@ -107,12 +108,13 @@ function initPIXI() {
 		fontFamily: '"Noto Sans", "Noto Sans SC", sans-serif', fontSize: 40, fill: '0xFFFFFF', align: 'center'
 	});
 	app.stage.addChild(subtitle);
-	app.ticker.add((elapsedMS) => {
-		if (lowerThirdAnimating) {
-			lowerThird.alpha += 0.05;
+	app.ticker.add(() => {
+		if (lowerThirdAnimation.animating) {
+			const elapsedTime = performance.now() - lowerThirdAnimation.startTime;
+			lowerThird.alpha = elapsedTime / 1000;
 			if (lowerThird.alpha >= 1) {
 				lowerThird.alpha = 1;
-				lowerThirdAnimating = false;
+				lowerThirdAnimation.animating = false;
 			}
 		}
 	});
@@ -190,7 +192,7 @@ function layout() {
 		lowerThirdBg3.x = lowerThirdBg1.width + lowerThirdBg2.width;
 		// console.log("lowerThirdBg1.width " + lowerThirdBg1.width);
 		// console.log("lowerThirdBg3.width " + lowerThirdBg3.width);
-		// console.log("lowerThirdHeader.x " + lowerThirdHeader.x);
+		// console.log("lowerThirdHeader.position " + lowerThirdHeader.position);
 		// console.log("mw:" + middleWidth);
 		// console.log(metricsHeader.width + " " + metricsDescription.width);
 		// console.log(lowerThirdBg1.width + "/" + lowerThirdBg2.width + "/" + lowerThirdBg3.x);

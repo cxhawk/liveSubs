@@ -23,7 +23,7 @@
           </el-col>
           <el-col>
             <div style="float: right">
-              <el-tooltip content="Hide all contents on projection window (⌘+M)" placement="top" effect="light">
+              <el-tooltip content="Hide all contents on projection window temporarily (⌘+0)" placement="top" effect="light">
                 <el-button :type="muted ? 'danger' : 'plain'" size="small" icon="el-icon-circle-close" @click="mute">
                   MUTE
                 </el-button>
@@ -115,13 +115,22 @@ export default {
     });
     ipcRenderer.on("showProjection", () => {
       this.openWindow();
+    });
+    ipcRenderer.on("clearSubtitle", () => {
+      this.$store.dispatch("showSubtitle", {episodeId: null, lyricsId: null});
+    })
+    ipcRenderer.on("clearLowerThird", () => {
+      this.$store.dispatch("showLowerThird", null);
     })
   },
   mounted() {
     window.onkeyup = e => {
       if(e.keyCode == 32 || e.key === " ") {
-        this.$store.dispatch("nextSubtitle");
-        this.scrollToCurrentItem();
+        if (e.target.nodeName !== "INPUT" && e.target.nodeName !== "TEXTAREA") {
+          console.log(e);
+          this.$store.dispatch("nextSubtitle");
+          this.scrollToCurrentItem();
+        }
       }
     }
     window.onkeydown = e => {

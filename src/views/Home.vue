@@ -3,7 +3,7 @@
     <el-tabs v-model="activeTab" type="border-card">
       <el-tab-pane label="General" name="general">
         <el-form label-position="right" label-width="130px">
-          <el-form-item label="Background Color">
+          <el-form-item label="Background Color*">
             <el-color-picker v-model="settings.backgroundColor" :predefine="['#009933', '#00FF00']" @change="update"></el-color-picker>
           </el-form-item>
         </el-form>
@@ -40,8 +40,8 @@
       </el-tab-pane>
       <el-tab-pane label="Lower third" name="lower">
         <el-form label-position="right" label-width="130px">
-          <el-form-item label="Background Image">
-            <el-image :src="settings.lowerThirdBg" :fit="contain"></el-image>
+          <el-form-item label="Background Image*">
+            <el-image :src="settings.lowerThirdBg" fit="contain"></el-image>
             <el-input v-model="settings.lowerThirdBg" @change="update"></el-input>
           </el-form-item>
           <el-form-item label="Title Size">

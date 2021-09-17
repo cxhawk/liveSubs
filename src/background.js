@@ -108,7 +108,7 @@ async function showLowerThird(item) {
 
 ipcMain.on("updateSettings", (event, arg) => {
   if (projectionWindow) {
-    //console.log(arg)
+    console.log(arg)
     projectionWindow.setBackgroundColor(arg.backgroundColor)
     projectionWindow.webContents.send("updateSettings", arg)
   }
@@ -179,11 +179,17 @@ app.on('ready', async () => {
   globalShortcut.register('CommandOrControl+Left', () => {
     mainWindow.webContents.send("previousSubtitle")
   })
-  globalShortcut.register('CommandOrControl+M', () => {
+  globalShortcut.register('CommandOrControl+0', () => {
     toggleHideAll()
   })
   globalShortcut.register('CommandOrControl+O', () => {
     mainWindow.webContents.send("showProjection")
+  })
+  globalShortcut.register('CommandOrControl+2', () => {
+    mainWindow.webContents.send("clearSubtitle")
+  })
+  globalShortcut.register('CommandOrControl+1', () => {
+    mainWindow.webContents.send("clearLowerThird")
   })
 
   createWindow()

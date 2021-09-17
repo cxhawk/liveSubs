@@ -5,9 +5,11 @@
         <span style="font-size: 16px">{{ currentEpisode.title }}</span>
       </el-col>
       <el-col style="width: 110px">
-        <el-button icon="el-icon-close" size="small" type="danger" @click="clear" :disabled="currentSubtitleEpisodeId !== currentEpisode.id"
-          >Clear
-        </el-button>
+        <el-tooltip content="deactivate subtitle (⌘+2)" placement="bottom" effect="light">
+          <el-button icon="el-icon-close" size="small" type="danger" @click="clear" :disabled="currentSubtitleEpisodeId !== currentEpisode.id"
+            >Clear
+          </el-button>
+        </el-tooltip>
       </el-col>
       <el-col style="width: 110px">
         <el-button icon="el-icon-plus" size="small" @click="importLines"
@@ -133,6 +135,9 @@ export default {
       event.stopPropagation();
       const index = this.indexOfRow(row);
       if (index >= 0) {
+        if (row.id === this.currentSubtitleId) {
+          this.clear();
+        }
         this.currentEpisode.lyrics.splice(index, 1);
         this.$store.dispatch("save");
       }
@@ -142,6 +147,9 @@ export default {
       MessageBox.prompt("", "Edit", {inputValue: row.text}).then(response => {
           const title = response.value;
           row.text = title;
+          if (row.id === this.currentSubtitleId) {
+            this.$store.dispatch("showSubtitle", {episodeId: this.currentSubtitleEpisodeId, lyricsId: this.currentSubtitleId});
+          }
           this.$store.dispatch("save");
         });
     },
