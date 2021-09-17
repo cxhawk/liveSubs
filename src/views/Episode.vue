@@ -114,7 +114,7 @@ export default {
         if (lines.length) {
           let newLyrics = [];
           for (const line of lines) {
-            newLyrics.push({ id: nanoid(), text: line });
+            newLyrics.push({ id: nanoid(), text: line.trim() });
           }
           if (Array.isArray(this.currentEpisode.lyrics)) {
             this.currentEpisode.lyrics =

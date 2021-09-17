@@ -124,9 +124,9 @@ export default {
           for (const line of lines) {
             const elements = line.split("|");
             if (elements.length >= 2) {
-              newItems.push({ id: nanoid(), title: elements[0], description: elements[1] });
+              newItems.push({ id: nanoid(), title: elements[0].trim(), description: elements[1].trim() });
             } else {
-              newItems.push({ id: nanoid(), title: line});
+              newItems.push({ id: nanoid(), title: line.trim()});
             }
           }
           this.lowerThirds = this.lowerThirds.concat(newItems);
