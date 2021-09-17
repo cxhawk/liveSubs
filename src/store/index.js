@@ -9,7 +9,7 @@ export default new Vuex.Store({
   state: {
     episodes: localStorage.getItem("episodes") ? JSON.parse(localStorage.getItem("episodes")) : [],
     lowerThirds: localStorage.getItem("lowerThirds") ? JSON.parse(localStorage.getItem("lowerThirds")) : [],
-    settings: localStorage.getItem("settings") ? JSON.parse(localStorage.getItem("settings")) : {
+    settings: Object.assign({
       backgroundColor: "#009933",
       // subtitle settings
       fontFamily: "Noto Sans SC",
@@ -30,7 +30,7 @@ export default new Vuex.Store({
       lowerThirdDescriptionColor: "#8D8F8E",
       lowerThirdDescriptionX: 30,
       lowerThirdDescriptionY: 105,
-    },
+    }, JSON.parse(localStorage.getItem("settings"))),
     currentSubtitleEpisodeId: null,
     currentSubtitleId: null,
     currentLowerThirdId: null
@@ -61,7 +61,7 @@ export default new Vuex.Store({
     },
     updateSettings(context) {
       localStorage.setItem("settings", JSON.stringify(context.state.settings));
-      console.log(context.state.settings);
+      //console.log(context.state.settings);
       ipcRenderer.send("updateSettings", context.state.settings);
     },
     showSubtitle(context, {episodeId, lyricsId}) {
