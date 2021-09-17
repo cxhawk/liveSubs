@@ -8,18 +8,32 @@ Vue.use(Vuex)
 export default new Vuex.Store({
   state: {
     episodes: localStorage.getItem("episodes") ? JSON.parse(localStorage.getItem("episodes")) : [],
+    lowerThirds: localStorage.getItem("lowerThirds") ? JSON.parse(localStorage.getItem("lowerThirds")) : [],
     settings: localStorage.getItem("settings") ? JSON.parse(localStorage.getItem("settings")) : {
       backgroundColor: "#009933",
+      // subtitle settings
       fontFamily: "Noto Sans SC",
       fontSize: 50,
       fontWeight: "700",
       color: "#FFFFFF",
       strokeColor: "#000000",
       strokeSize: 2,
-      addShadow: false
+      addShadow: false,
+      centerAlign: true,
+      // lower third settings
+      lowerThirdBg: "./images/lowerThird.png",
+      lowerThirdTitleFontSize: 64,
+      lowerThirdTitleColor: "#FFFFFF",
+      lowerThirdTitleX: 30,
+      lowerThirdTitleY: 8,
+      lowerThirdDescriptionFontSize: 24,
+      lowerThirdDescriptionColor: "#8D8F8E",
+      lowerThirdDescriptionX: 30,
+      lowerThirdDescriptionY: 105,
     },
     currentSubtitleEpisodeId: null,
-    currentSubtitleId: null
+    currentSubtitleId: null,
+    currentLowerThirdId: null
   },
   getters: {
     // Add the `getField` getter to the
@@ -32,6 +46,10 @@ export default new Vuex.Store({
       }
       return null;
     },
+    currentLowerThird: state => {
+      const currentLowerThird = state.lowerThirds.find((item) => item.id === state.currentLowerThirdId);
+      return currentLowerThird;
+    }
   },
   mutations: {
     updateField
@@ -39,6 +57,7 @@ export default new Vuex.Store({
   actions: {
     save(context) {
       localStorage.setItem("episodes", JSON.stringify(context.state.episodes));
+      localStorage.setItem("lowerThirds", JSON.stringify(context.state.lowerThirds));
     },
     updateSettings(context) {
       localStorage.setItem("settings", JSON.stringify(context.state.settings));
@@ -49,6 +68,10 @@ export default new Vuex.Store({
       context.state.currentSubtitleEpisodeId = episodeId;
       context.state.currentSubtitleId = lyricsId;
       ipcRenderer.send("showSubtitle", context.getters.currentSubtitle);
+    },
+    showLowerThird(context, identifer) {
+      context.state.currentLowerThirdId = identifer;
+      ipcRenderer.send("showLowerThird", context.getters.currentLowerThird);
     },
     previousSubtitle(context) {
       const currentEpisode = context.state.episodes.find((ep) => ep.id === context.state.currentSubtitleEpisodeId);

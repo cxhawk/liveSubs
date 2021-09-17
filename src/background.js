@@ -9,7 +9,8 @@ let mainWindow = null
 let projectionWindow = null
 let hideAllCSSKey = null
 let muted = false
-let currentSubtitle = ""
+let currentSubtitle = null
+let currentLowerThird = null
 
 // Scheme must be registered before the app is ready
 protocol.registerSchemesAsPrivileged([
@@ -17,9 +18,33 @@ protocol.registerSchemesAsPrivileged([
 ])
 
 ipcMain.on("showProjection", (event, arg) => {
+  showProjection(arg)
+})
+
+ipcMain.handle("mute", () => {
+  return toggleHideAll()
+})
+
+async function toggleHideAll() {
+  if (projectionWindow) {
+    if (hideAllCSSKey) {
+      projectionWindow.webContents.removeInsertedCSS(hideAllCSSKey)
+      hideAllCSSKey = null
+      muted = false
+    } else {
+      hideAllCSSKey = await projectionWindow.webContents.insertCSS("body {display: none}")
+      muted = true
+    }
+  } else {
+    muted = !muted;
+  }
+  mainWindow.webContents.send("muteStatus", muted);
+}
+
+async function showProjection(settings) {
   if (projectionWindow === null) {
     projectionWindow = new BrowserWindow({
-      fullscreenable: true, backgroundColor: arg.backgroundColor, show: false, webPreferences: {
+      fullscreenable: true, backgroundColor: settings.backgroundColor, show: false, webPreferences: {
         nodeIntegration: true,
         contextIsolation: false,
       }
@@ -45,39 +70,23 @@ ipcMain.on("showProjection", (event, arg) => {
         }
       }
       // restore states
-      projectionWindow.webContents.send("updateSettings", arg);
+      projectionWindow.webContents.send("updateSettings", settings);
       if (muted && !hideAllCSSKey) {
         toggleHideAll()
       }
-      if (currentSubtitle) {
-        showSubtitle(currentSubtitle)
-      }
+      showSubtitle(currentSubtitle)
+      showLowerThird(currentLowerThird)
+
       projectionWindow.show()
     })
   } else {
     projectionWindow.show()
   }
-})
-
-ipcMain.handle("mute", () => {
-  return toggleHideAll()
-})
-
-async function toggleHideAll() {
-  if (projectionWindow) {
-    if (hideAllCSSKey) {
-      projectionWindow.webContents.removeInsertedCSS(hideAllCSSKey)
-      hideAllCSSKey = null
-      muted = false
-    } else {
-      hideAllCSSKey = await projectionWindow.webContents.insertCSS("body {display: none}")
-      muted = true
-    }
-  } else {
-    muted = !muted;
-  }
-  mainWindow.webContents.send("muteStatus", muted);
 }
+
+ipcMain.on("showSubtitle", (event, arg) => {
+  showSubtitle(arg)
+})
 
 async function showSubtitle(item) {
   if (projectionWindow) {
@@ -86,13 +95,20 @@ async function showSubtitle(item) {
   currentSubtitle = item
 }
 
-ipcMain.on("showSubtitle", (event, arg) => {
-  showSubtitle(arg)
+ipcMain.on("showLowerThird", (event, arg) => {
+  showLowerThird(arg)
 })
+
+async function showLowerThird(item) {
+  if (projectionWindow) {
+    projectionWindow.webContents.send("showLowerThird", item)
+  }
+  currentLowerThird = item
+}
 
 ipcMain.on("updateSettings", (event, arg) => {
   if (projectionWindow) {
-    console.log(arg)
+    //console.log(arg)
     projectionWindow.setBackgroundColor(arg.backgroundColor)
     projectionWindow.webContents.send("updateSettings", arg)
   }
@@ -166,6 +182,10 @@ app.on('ready', async () => {
   globalShortcut.register('CommandOrControl+M', () => {
     toggleHideAll()
   })
+  globalShortcut.register('CommandOrControl+O', () => {
+    mainWindow.webContents.send("showProjection")
+  })
+
   createWindow()
 })
 

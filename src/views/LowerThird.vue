@@ -2,10 +2,7 @@
   <div>
     <el-row :gutter="10" type="flex" justify="end">
       <el-col>
-        <span style="font-size: 16px">{{ currentEpisode.title }}</span>
-      </el-col>
-      <el-col style="width: 110px">
-        <el-button icon="el-icon-close" size="small" type="danger" @click="clear" :disabled="currentSubtitleEpisodeId !== currentEpisode.id"
+        <el-button icon="el-icon-close" size="small" type="danger" @click="clear" :disabled="currentLowerThirdId === null"
           >Clear
         </el-button>
       </el-col>
@@ -24,17 +21,18 @@
     </el-row>
     <span style="font-size: 12px; color: gray">Click to show a line, press spacebar go next or ⌘ + ←/→ to move around</span>
     <el-table
-      :data="currentEpisode.lyrics"
+      :data="lowerThirds"
       style="width: 100%; margin-top: 10px"
-      v-if="currentEpisode.lyrics"
+      v-if="lowerThirds"
       highlight-current-row
       @current-change="currentChanged"
       ref="table"
       row-key="id"
-      :current-row-key="currentSubtitleId"
+      :current-row-key="currentLowerThirdId"
     >
       <el-table-column type="index" width="50"> </el-table-column>
-      <el-table-column prop="text" label="Text"> </el-table-column>
+      <el-table-column prop="title" label="Title"> </el-table-column>
+      <el-table-column prop="description" label="Description"> </el-table-column>
       <el-table-column fixed="right" label="Action" width="100">
         <template slot-scope="scope">
           <el-button @click="insertLine(scope.row, $event)" type="text" size="small" icon="el-icon-s-unfold"
@@ -49,14 +47,6 @@
         </template>
       </el-table-column>
     </el-table>
-    <el-row style="margin-top: 15px" :gutter="10" type="flex" justify="end">
-      <el-col style="width: 90px">
-        <el-button size="small" @click="rename">Rename</el-button>
-      </el-col>
-      <el-col style="width: 90px">
-        <el-button type="danger" size="small" @click="deleteEpisode">Delete</el-button>
-      </el-col>
-    </el-row>
     <el-dialog title="Import Lines" :visible.sync="importDialogVisible" width="70%">
       <el-input
         type="textarea"
@@ -90,18 +80,14 @@ export default {
   },
   computed: {
     ...mapFields([
-      "episodes",
-      "currentSubtitleEpisodeId",
-      "currentSubtitleId",
+      "lowerThirds",
+      "currentLowerThirdId",
     ]),
-    currentEpisode() {
-      return this.episodes.find((ep) => ep.id === this.$route.params.id);
-    },
   },
   methods: {
-    clear() {
-      this.$store.dispatch("showSubtitle", {episodeId: null, lyricsId: null});
-    },
+		clear() {
+			this.$store.dispatch("showLowerThird", null);
+		},
     importLines() {
       this.importDialogVisible = true;
     },
@@ -110,38 +96,33 @@ export default {
       if (this.importText.length) {
         const lines = this.importText.split(/\r?\n/);
         if (lines.length) {
-          let newLyrics = [];
+          let newItems = [];
           for (const line of lines) {
-            newLyrics.push({ id: nanoid(), text: line });
+            newItems.push({ id: nanoid(), title: line });
           }
-          if (Array.isArray(this.currentEpisode.lyrics)) {
-            this.currentEpisode.lyrics =
-              this.currentEpisode.lyrics.concat(newLyrics);
-          } else {
-            this.currentEpisode.lyrics = newLyrics;
-          }
+          this.lowerThirds = this.lowerThirds.concat(newItems);
           this.$store.dispatch("save");
         }
       }
       this.importText = "";
     },
     removeAll() {
-      this.currentEpisode.lyrics = [];
+      this.lowerThirds = [];
       this.$store.dispatch("save");
     },
     removeLine(row, event) {
       event.stopPropagation();
       const index = this.indexOfRow(row);
       if (index >= 0) {
-        this.currentEpisode.lyrics.splice(index, 1);
+        this.lowerThirds.splice(index, 1);
         this.$store.dispatch("save");
       }
     },
     editLine(row, event) {
       event.stopPropagation();
-      MessageBox.prompt("", "Edit", {inputValue: row.text}).then(response => {
+      MessageBox.prompt("", "Edit", {inputValue: row.title}).then(response => {
           const title = response.value;
-          row.text = title;
+          row.title = title;
           this.$store.dispatch("save");
         });
     },
@@ -152,39 +133,23 @@ export default {
         MessageBox.prompt("Add one line before", "Insert").then(response => {
           const text = response.value;
           const identifier = nanoid();
-          const lyric = {
+          const item = {
             id: identifier,
-            text: text
+            title: text
           };
-          this.currentEpisode.lyrics.splice(index, 0, lyric);
+          this.lowerThirds.splice(index, 0, item);
           this.$store.dispatch("save");
         });
       }
     },
     indexOfRow(row) {
-      return this.currentEpisode.lyrics.findIndex((element) => {
+      return this.lowerThirds.findIndex((element) => {
         return (element.id === row.id);
       });
     },
     currentChanged(row) {
-      this.$store.dispatch("showSubtitle", {episodeId: this.$route.params.id, lyricsId: row.id});
+      this.$store.dispatch("showLowerThird", row.id);
     },
-    rename() {
-      MessageBox.prompt("a new name for this subtitle?", "Rename", {inputValue: this.currentEpisode.title}).then(response => {
-          const title = response.value;
-          this.currentEpisode.title = title;
-          this.$store.dispatch("save");
-        });
-    },
-    deleteEpisode() {
-      MessageBox.confirm("Are you sure to delete this subtitle?", "Confirm").then(() => {
-        const index = this.episodes.indexOf(this.currentEpisode);
-        if (index>=0) {
-          this.$router.push("/");
-          this.episodes.splice(index, 1);
-        }
-      });
-    }
   },
 };
 </script>

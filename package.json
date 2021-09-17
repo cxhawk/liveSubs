@@ -24,6 +24,7 @@
     "vuex-map-fields": "^1.4.1"
   },
   "devDependencies": {
+    "@types/pixi.js": "^5.0.0",
     "@vue/cli-plugin-babel": "~4.5.0",
     "@vue/cli-plugin-eslint": "~4.5.0",
     "@vue/cli-plugin-router": "~4.5.0",

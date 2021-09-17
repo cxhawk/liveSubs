@@ -19,13 +19,18 @@
             </el-row>
           </el-col>
           <el-col class="preview" v-if="currentSubtitleText">
-            {{currentSubtitleText.text}}
+            {{currentSubtitleText}}
           </el-col>
           <el-col>
             <div style="float: right">
-              <el-tooltip content="Hide all contents on projection window (⌘+M)" placement="bottom" effect="light">
-                <el-button :type="muted ? 'danger' : 'plain'" size="small" @click="mute">
+              <el-tooltip content="Hide all contents on projection window (⌘+M)" placement="top" effect="light">
+                <el-button :type="muted ? 'danger' : 'plain'" size="small" icon="el-icon-circle-close" @click="mute">
                   MUTE
+                </el-button>
+              </el-tooltip>
+              <el-tooltip content="Open the projection window (⌘+O)" placement="bottom" effect="light">
+                <el-button size="small" type="primary" icon="el-icon-monitor" @click="openWindow">
+                  OPEN
                 </el-button>
               </el-tooltip>
             </div>
@@ -36,6 +41,10 @@
         <el-aside class="left">
           <el-menu :default-active="$route.fullPath" :default-openeds="openMenu" router>
             <el-menu-item index="/"><i class="el-icon-setting"></i>Settings</el-menu-item>
+            <el-menu-item index="/lowerthird" :class="{activeItem: currentLowerThirdTitle}">
+              <i class="el-icon-s-unfold"></i>
+              {{!currentLowerThirdId ? 'Lower Third' : currentLowerThirdTitle}}
+            </el-menu-item>
             <el-submenu index="/episodes">
               <template slot="title">
                 <i class="el-icon-document-copy"></i>
@@ -45,8 +54,10 @@
                 <i class="el-icon-plus"></i>
                 <span>New</span>
               </el-menu-item>
-              <el-menu-item :index="'/episode/' + episode.id" v-for="episode in episodes" :key="episode.id" class="episodeCell">
-                <p class="episodeCellParagraph">{{ episode.title }}</p>
+              <el-menu-item :index="'/episode/' + episode.id" v-for="episode in episodes" :key="episode.id" class="episodeCell" :class="{activeItem: currentSubtitleEpisodeId === episode.id}">
+                <p class="episodeCellParagraph">
+                  {{episode.title}}
+                </p>
               </el-menu-item>
             </el-submenu>
           </el-menu>
@@ -80,13 +91,14 @@ export default {
       'episodes',
       'currentSubtitleEpisodeId',
       'currentSubtitleId',
+      'currentLowerThirdId',
+      'settings'
     ]),
     currentSubtitleText() {
-      const currentEpisode = this.episodes.find((ep) => ep.id === this.currentSubtitleEpisodeId);
-      if (currentEpisode) {
-        return currentEpisode.lyrics.find((element) => element.id === this.currentSubtitleId);
-      }
-      return null;
+      return this.$store.getters.currentSubtitle ? this.$store.getters.currentSubtitle.text : null;
+    },
+    currentLowerThirdTitle() {
+      return this.$store.getters.currentLowerThird ? this.$store.getters.currentLowerThird.title : null;
     }
   },
   created() {
@@ -101,6 +113,9 @@ export default {
     ipcRenderer.on("muteStatus", (event, arg) => {
       this.muted = arg;
     });
+    ipcRenderer.on("showProjection", () => {
+      this.openWindow();
+    })
   },
   mounted() {
     window.onkeyup = e => {
@@ -139,6 +154,9 @@ export default {
     mute() {
       ipcRenderer.invoke("mute");
     },
+    openWindow() {
+      ipcRenderer.send("showProjection", this.settings);
+    },
     scrollToCurrentItem() {
       setTimeout(() => {
         const element = document.querySelector(".current-row");
@@ -153,12 +171,12 @@ export default {
 
 <style>
   :root {
-    --left-width: 250px;
+    --left-width: 300px;
     --top-height: 60px;
   }
   @media only screen and (max-width: 650px) {
     :root {
-      --left-width: 150px;
+      --left-width: 200px;
     }
   }
   
@@ -272,9 +290,12 @@ export default {
   }
   .episodeCellParagraph {
     line-height: 15px !important;
-    font-size: 14px !important;
+    font-size: 15px !important;
     overflow: hidden;
     text-overflow: ellipsis;
+  }
+  .activeItem {
+    color: rgb(255, 90, 90) !important;
   }
   .preview {
     text-align: center;

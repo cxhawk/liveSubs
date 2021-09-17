@@ -1,0 +1,8 @@
+html {
+	cursor: none;
+}
+body {
+	margin: 0;
+	overflow: hidden;
+	font-family: "Noto Sans", "Noto Sans SC", sans-serif;
+}
