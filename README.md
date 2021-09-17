@@ -1,6 +1,9 @@
-# subtitle
+# Live Subtitles and Lower Third
 
-## Project setup
+<img width="1136" alt="Screen Shot 2021-09-17 at 2 53 24 PM" src="https://user-images.githubusercontent.com/14524765/133857593-6edbcd7d-75c1-4c57-b364-6d0bba375568.png">
+
+
+## Compile from sources
 ```
 npm install
 ```
@@ -15,10 +18,3 @@ npm run electron:serve
 npm run electron:build
 ```
 
-### Lints and fixes files
-```
-npm run lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
