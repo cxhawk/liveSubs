@@ -1,6 +1,6 @@
 'use strict'
 
-import { app, protocol, BrowserWindow, screen, globalShortcut } from 'electron'
+import { app, protocol, BrowserWindow, screen, globalShortcut, dialog } from 'electron'
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
 import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer'
 const { ipcMain } = require('electron')
@@ -29,6 +29,15 @@ ipcMain.on("showProjection", (event, arg) => {
 
 ipcMain.handle("mute", () => {
   return toggleHideAll()
+})
+
+ipcMain.handle("openImage", () => {
+  return dialog.showOpenDialogSync({
+    title: "Open background image file",
+    filters: [
+      { name: 'Images', extensions: ['jpg', 'png'] }
+    ]
+  });
 })
 
 async function toggleHideAll() {
@@ -177,6 +186,12 @@ app.on('ready', async () => {
       console.error('Vue Devtools failed to install:', e.toString())
     }
   }
+
+  protocol.registerFileProtocol("atom", (request, callback) => {
+    const path = request.url.substr(7);
+    console.log(path);
+    callback(path);
+  })
 
   globalShortcut.unregisterAll();
   globalShortcut.register('CommandOrControl+Right', () => {
