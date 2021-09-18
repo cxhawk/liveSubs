@@ -6,7 +6,7 @@ let lowerThird = new PIXI.Container();
 let lowerThirdHeader = new PIXI.Text();
 let lowerThirdDescription = new PIXI.Text();
 let lowerThirdTexture = null;
-let lowerThirdBg1 = null, lowerThirdBg2 = null, lowerThirdBg3 = null;
+let lowerThirdBg = null, lowerThirdBg1 = null, lowerThirdBg2 = null, lowerThirdBg3 = null;
 let lowerThirdAnimation = {animating: false, startTime: 0};
 let settings = {
 	backgroundColor: "#009933",
@@ -21,6 +21,8 @@ let settings = {
 	centerAlign: true,
 	// lower third settings
 	lowerThirdBg: "./images/lowerThird.png",
+	lowerThirdResize: true,
+  lowerThirdCenter: false,
 	lowerThirdTitleFontSize: 64,
 	lowerThirdTitleColor: "#FFFFFF",
 	lowerThirdTitleX: 30,
@@ -29,6 +31,8 @@ let settings = {
 	lowerThirdDescriptionColor: "#8D8F8E",
 	lowerThirdDescriptionX: 30,
 	lowerThirdDescriptionY: 105,
+	lowerThirdTitleCenter: false,
+	lowerThirdDescriptionCenter: false
 };
 
 window.onload = function () {
@@ -96,7 +100,7 @@ window.onload = function () {
 			fontWeight: 300,
 			fill: arg.lowerThirdDescriptionColor,
 		}
-		layout();
+		updateTexture();
 	});
 }
 
@@ -112,17 +116,29 @@ function initPIXI() {
 			}
 		}
 	});
-	
+
+	lowerThird.addChild(lowerThirdHeader);
+	lowerThird.addChild(lowerThirdDescription);
+	app.stage.addChild(lowerThird);
+	document.body.appendChild(app.view);
+}
+
+function updateTexture() {
 	PIXI.Texture.fromURL(settings.lowerThirdBg).then((bgTexture) => {
+		lowerThird.removeChildren();
 		lowerThirdTexture = bgTexture;
 		const oneThirdOfWidth = Math.floor(bgTexture.width / 3);
+		
+		lowerThirdBg = new PIXI.Sprite(bgTexture);
 		const texture1 = bgTexture.clone();
 		texture1.frame = new PIXI.Rectangle(0, 0, oneThirdOfWidth, bgTexture.height);
 		lowerThirdBg1 = new PIXI.Sprite(texture1);
+		
+		lowerThird.addChild(lowerThirdBg);
 		lowerThird.addChild(lowerThirdBg1);
 
 		const texture2 = bgTexture.clone();
-		texture2.frame = new PIXI.Rectangle(texture1.width, 0, 10, bgTexture.height);
+		texture2.frame = new PIXI.Rectangle(oneThirdOfWidth, 0, 10, bgTexture.height);
 		lowerThirdBg2 = new PIXI.TilingSprite(texture2, 300, bgTexture.height);
 		lowerThird.addChild(lowerThirdBg2);
 
@@ -131,26 +147,10 @@ function initPIXI() {
 		lowerThirdBg3 = new PIXI.Sprite(texture3);
 		lowerThird.addChild(lowerThirdBg3);
 
-		lowerThirdHeader.style = {
-			fontFamily: '"Noto Sans", "Noto Sans SC", sans-serif', 
-			fontSize: 64,
-			fontWeight: 700,
-			fill: "white", 
-		};
-		lowerThirdDescription.style = {
-			fontFamily: '"Noto Sans", "Noto Sans SC", sans-serif', 
-			fontSize: 24,
-			fontWeight: 300,
-			fill: "#8D8F8E",
-		}
-
-		layout();
-
 		lowerThird.addChild(lowerThirdHeader);
 		lowerThird.addChild(lowerThirdDescription);
-		app.stage.addChild(lowerThird);
 
-		document.body.appendChild(app.view);
+		layout();
 	});
 }
 
@@ -172,6 +172,8 @@ function layout() {
 		lowerThirdHeader.y = settings.lowerThirdTitleY;
 		lowerThirdDescription.x = settings.lowerThirdDescriptionX;
 		lowerThirdDescription.y = settings.lowerThirdDescriptionY;
+		lowerThirdHeader.anchor.x = settings.lowerThirdTitleCenter ? 0.5: 0;
+		lowerThirdDescription.anchor.x = settings.lowerThirdDescriptionCenter ? 0.5: 0;
 
 		const metricsHeader = PIXI.TextMetrics.measureText(lowerThirdHeader.text, lowerThirdHeader.style);
 		const metricsDescription = PIXI.TextMetrics.measureText(lowerThirdDescription.text, lowerThirdDescription.style);
@@ -181,9 +183,15 @@ function layout() {
 		if (middleWidth < 0) {
 			middleWidth = 0;
 		}
-		
 		lowerThirdBg2.width = middleWidth;
 		lowerThirdBg3.x = lowerThirdBg1.width + lowerThirdBg2.width;
+		
+		lowerThirdBg.x = 0;
+		lowerThirdBg.visible = !settings.lowerThirdResize;
+		lowerThirdBg1.visible = settings.lowerThirdResize;
+		lowerThirdBg2.visible = settings.lowerThirdResize;
+		lowerThirdBg3.visible = settings.lowerThirdResize;
+		
 		// console.log("lowerThirdBg1.width " + lowerThirdBg1.width);
 		// console.log("lowerThirdBg3.width " + lowerThirdBg3.width);
 		// console.log("lowerThirdHeader.position " + lowerThirdHeader.position);
@@ -191,7 +199,12 @@ function layout() {
 		// console.log(metricsHeader.width + " " + metricsDescription.width);
 		// console.log(lowerThirdBg1.width + "/" + lowerThirdBg2.width + "/" + lowerThirdBg3.x);
 		
-		lowerThird.x = 50;
+		if (settings.lowerThirdCenter) {
+			lowerThird.x = (w - lowerThird.width) / 2;
+		} else {
+			lowerThird.x = 50;
+		}
+		
 		lowerThird.y = h - (lowerThirdTexture.height + 50);
 	}
 }

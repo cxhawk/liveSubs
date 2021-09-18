@@ -22,6 +22,8 @@ export default new Vuex.Store({
       centerAlign: true,
       // lower third settings
       lowerThirdBg: "./images/lowerThird.png",
+      lowerThirdResize: true,
+      lowerThirdCenter: false,
       lowerThirdTitleFontSize: 64,
       lowerThirdTitleColor: "#FFFFFF",
       lowerThirdTitleX: 30,
