@@ -24,7 +24,8 @@ module.exports = async function (params) {
       appBundleId: appId,
       appPath: appPath,
       appleId: "cxhawk@gmail.com",
-      appleIdPassword: "AppSpecific",
+      //security add-generic-password -a "appleid@email.com" -w <app_specific_password> -s "AC_PASSWORD"
+      appleIdPassword: "@keychain:AC_PASSWORD", 
       ascProvider: "XiangCao191131129"
     });
   } catch (error) {

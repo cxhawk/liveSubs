@@ -17,6 +17,12 @@ protocol.registerSchemesAsPrivileged([
   { scheme: 'app', privileges: { secure: true, standard: true } }
 ])
 
+// Auto updater
+require('update-electron-app')({
+  repo: 'cxhawk/liveSubs',
+  updateInterval: '1 hour'
+})
+
 ipcMain.on("showProjection", (event, arg) => {
   showProjection(arg)
 })
