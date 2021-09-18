@@ -50,7 +50,11 @@ async function toggleHideAll() {
 async function showProjection(settings) {
   if (projectionWindow === null) {
     projectionWindow = new BrowserWindow({
-      fullscreenable: true, backgroundColor: settings.backgroundColor, show: false, webPreferences: {
+      fullscreenable: true, 
+      backgroundColor: settings.backgroundColor, 
+      show: false, 
+      autoHideMenuBar: true,
+      webPreferences: {
         nodeIntegration: true,
         contextIsolation: false,
       }
