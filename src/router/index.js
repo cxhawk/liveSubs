@@ -16,7 +16,7 @@ const routes = [
     component: () => import('../views/Episode.vue')
   },
   {
-    path: '/lowerthird',
+    path: '/lowerthird/:id',
     name: 'lowerthird',
     component: () => import('../views/LowerThird.vue')
   }

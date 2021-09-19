@@ -8,12 +8,12 @@
           </el-button>
         </el-tooltip>
       </el-col>
-      <el-col style="width: 110px">
+      <el-col style="width: 120px">
         <el-button icon="el-icon-plus" size="small" @click="importLines"
-          >Import
+          >Import Items
         </el-button>
       </el-col>
-      <el-col style="width: 110px">
+      <el-col style="width: 120px">
         <el-popconfirm title="Are you sure？" @confirm="removeAll">
           <el-button icon="el-icon-delete" size="small" slot="reference"
             >Remove All</el-button
@@ -22,9 +22,9 @@
       </el-col>
     </el-row>
     <el-table
-      :data="lowerThirds"
+      :data="currentTemplate.items"
       style="width: 100%; margin-top: 10px"
-      v-if="lowerThirds"
+      v-if="currentTemplate"
       highlight-current-row
       @current-change="currentChanged"
       ref="table"
@@ -48,6 +48,53 @@
         </template>
       </el-table-column>
     </el-table>
+    <el-divider></el-divider>
+    <el-form label-position="right" label-width="130px">
+      <el-form-item label="Background Image">
+        <el-image :src="settings.lowerThirdBg" fit="contain"></el-image>
+        <el-input v-model="settings.lowerThirdBg" @change="update" readonly>
+          <el-button slot="prepend" @click="resetImage">Default</el-button>
+          <el-button slot="append" icon="el-icon-search" @click="locateImage">Browse</el-button>
+        </el-input>
+      </el-form-item>
+      <el-form-item label="Resize if needed">
+        <el-switch v-model="settings.lowerThirdResize" @change="update" active-text="repeat the middle 1/3 part of the image"></el-switch>
+      </el-form-item>
+      <el-form-item label="Center Align">
+        <el-switch v-model="settings.lowerThirdCenter" @change="update"></el-switch>
+      </el-form-item>
+      <el-form-item label="Title Size">
+        <el-input-number v-model="settings.lowerThirdTitleFontSize" @change="update" :min="10" :max="100"></el-input-number>
+      </el-form-item>
+      <el-form-item label="Title Color">
+        <el-color-picker v-model="settings.lowerThirdTitleColor" :predefine="['#FFFFFF']" @change="update"></el-color-picker>
+      </el-form-item>
+      <el-form-item label="Title Offset (X,Y)">
+        <el-input-number v-model="settings.lowerThirdTitleX" @change="update" :min="0"></el-input-number>&nbsp;
+        <el-input-number v-model="settings.lowerThirdTitleY" @change="update" :min="0" :max="200"></el-input-number>&nbsp;
+        <el-switch v-model="settings.lowerThirdTitleCenter" @change="update" active-text="Center"></el-switch>
+      </el-form-item>
+      <el-form-item label="Description Size">
+        <el-input-number v-model="settings.lowerThirdDescriptionFontSize" @change="update" :min="10" :max="100"></el-input-number>
+      </el-form-item>
+      <el-form-item label="Description Color">
+        <el-color-picker v-model="settings.lowerThirdDescriptionColor" :predefine="['#FFFFFF']" @change="update"></el-color-picker>
+      </el-form-item>
+      <el-form-item label="Description Offset (X,Y)">
+        <el-input-number v-model="settings.lowerThirdDescriptionX" @change="update" :min="0"></el-input-number>&nbsp;
+        <el-input-number v-model="settings.lowerThirdDescriptionY" @change="update" :min="0"></el-input-number>&nbsp;
+        <el-switch v-model="settings.lowerThirdDescriptionCenter" @change="update" active-text="Center"></el-switch>
+      </el-form-item>
+    </el-form>
+    <el-divider></el-divider>
+    <el-row style="margin-top: 15px" :gutter="10" type="flex" justify="end">
+      <el-col style="width: 90px">
+        <el-button size="small" @click="rename">Rename</el-button>
+      </el-col>
+      <el-col style="width: 90px">
+        <el-button type="danger" size="small" @click="deleteEpisode">Delete</el-button>
+      </el-col>
+    </el-row>
     <el-dialog title="Import Lower Third" :visible.sync="importDialogVisible" width="70%">
       <el-input
         type="textarea"
@@ -89,6 +136,8 @@
 <script>
 import { mapFields } from "vuex-map-fields";
 import { nanoid } from 'nanoid';
+import { MessageBox } from 'element-ui';
+const { ipcRenderer } = window.require('electron');
 
 export default {
   data() {
@@ -102,15 +151,26 @@ export default {
   computed: {
     ...mapFields([
       "lowerThirds",
+      "currentLowerThirdTemplateId",
       "currentLowerThirdId",
     ]),
+    currentTemplate() {
+      return this.lowerThirds.find((ep) => ep.id === this.$route.params.id);
+    },
+    settings() {
+      return this.currentTemplate.settings;
+    },
     isEditing() {
       return this.editingItem != null;
     }
   },
   methods: {
+    update() {
+      // update template if needed
+      this.$store.dispatch("updateSettings");
+    },
 		clear() {
-			this.$store.dispatch("showLowerThird", null);
+			this.$store.dispatch("showLowerThird", {templateId:null, itemId:null});
 		},
     importLines() {
       this.importDialogVisible = true;
@@ -129,14 +189,14 @@ export default {
               newItems.push({ id: nanoid(), title: line.trim()});
             }
           }
-          this.lowerThirds = this.lowerThirds.concat(newItems);
+          this.currentTemplate.items = this.currentTemplate.items.concat(newItems);
           this.$store.dispatch("save");
         }
       }
       this.importText = "";
     },
     removeAll() {
-      this.lowerThirds = [];
+      this.currentTemplate.items = [];
       this.$store.dispatch("save");
     },
     removeLine(row, event) {
@@ -146,7 +206,7 @@ export default {
         if (row.id === this.currentLowerThirdId) {
           this.clear();
         }
-        this.lowerThirds.splice(index, 1);
+        this.currentTemplate.items.splice(index, 1);
         this.$store.dispatch("save");
       }
     },
@@ -165,8 +225,8 @@ export default {
       }
     },
 		editConfirm() {
-			if (this.lowerThirds.includes(this.editingItem) === false) {
-				this.lowerThirds.splice(this.insertingIndex, 0, this.editingItem);
+			if (this.currentTemplate.items.includes(this.editingItem) === false) {
+				this.currentTemplate.items.splice(this.insertingIndex, 0, this.editingItem);
 				this.insertingIndex = 0;
 			}
       this.$store.dispatch("showLowerThird", this.currentLowerThirdId); // update in case text changed
@@ -174,13 +234,54 @@ export default {
 			this.editingItem = null;
 		},
     indexOfRow(row) {
-      return this.lowerThirds.findIndex((element) => {
+      return this.currentTemplate.items.findIndex((element) => {
         return (element.id === row.id);
       });
     },
     currentChanged(row) {
-      this.$store.dispatch("showLowerThird", row.id);
+      this.$store.dispatch("showLowerThird", {templateId: this.$route.params.id, itemId: row.id});
     },
+    rename() {
+      MessageBox.prompt("a new name for this template?", "Rename", {inputValue: this.currentTemplate.title}).then(response => {
+        const title = response.value;
+        this.currentTemplate.title = title;
+        this.$store.dispatch("save");
+      });
+    },
+    deleteEpisode() {
+      MessageBox.confirm("Are you sure to delete this template and all it's contents?", "Confirm").then(() => {
+        const index = this.lowerThirds.indexOf(this.currentTemplate);
+        if (index>=0) {
+          this.$router.push("/");
+          this.lowerThirds.splice(index, 1);
+          this.$store.dispatch("save");
+        }
+      });
+    },
+    locateImage() {
+      ipcRenderer.invoke("openImage").then((path) => {
+        if (path) {
+          this.settings.lowerThirdBg = "atom://" + path;
+          this.update();
+        }
+      });
+    },
+    resetImage() {
+      Object.assign(this.currentTemplate.settings, {
+        lowerThirdBg: "./images/lowerThird.png",
+        lowerThirdResize: true,
+        lowerThirdCenter: false,
+        lowerThirdTitleFontSize: 64,
+        lowerThirdTitleColor: "#FFFFFF",
+        lowerThirdTitleX: 30,
+        lowerThirdTitleY: 8,
+        lowerThirdDescriptionFontSize: 24,
+        lowerThirdDescriptionColor: "#8D8F8E",
+        lowerThirdDescriptionX: 30,
+        lowerThirdDescriptionY: 105,
+      });
+      this.update();
+    }
   },
 };
 </script>

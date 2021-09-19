@@ -41,10 +41,21 @@
         <el-aside class="left">
           <el-menu :default-active="$route.fullPath" :default-openeds="openMenu" router>
             <el-menu-item index="/"><i class="el-icon-setting"></i>Settings</el-menu-item>
-            <el-menu-item index="/lowerthird" :class="{activeItem: currentLowerThirdTitle}">
-              <i class="el-icon-s-unfold"></i>
-              {{!currentLowerThirdId ? 'Lower Third' : currentLowerThirdTitle}}
-            </el-menu-item>
+            <el-submenu index="/lowerthirds">
+              <template slot="title">
+                <i class="el-icon-s-unfold"></i>
+                <span>Lower Thirds</span>
+              </template>
+              <el-menu-item @click="addNewTemplate" class="episodeCell">
+                <i class="el-icon-plus"></i>
+                <span>New</span>
+              </el-menu-item>
+              <el-menu-item :index="'/lowerthird/' + template.id" v-for="template in lowerThirds" :key="template.id" class="episodeCell" :class="{activeItem: currentLowerThirdTemplateId === template.id}">
+                <p class="episodeCellParagraph">
+                  {{template.title}}
+                </p>
+              </el-menu-item>
+            </el-submenu>
             <el-submenu index="/episodes">
               <template slot="title">
                 <i class="el-icon-document-copy"></i>
@@ -89,10 +100,11 @@ export default {
   computed: {
     ...mapFields([
       'episodes',
+      'lowerThirds',
       'currentSubtitleEpisodeId',
       'currentSubtitleId',
+      'currentLowerThirdTemplateId',
       'currentLowerThirdId',
-      'settings'
     ]),
     currentSubtitleText() {
       return this.$store.getters.currentSubtitle ? this.$store.getters.currentSubtitle.text : null;
@@ -160,11 +172,45 @@ export default {
     goToEpisodeInfo(episodeInfo) {
       this.$router.push("/episode/" + episodeInfo.id);
     },
+    addNewTemplate() {
+      MessageBox.prompt("Give it a name", "New Lower Third Template").then(response => {
+        const name = response.value;
+        const identifier = nanoid();
+        const template = {
+          id: identifier,
+          title: name,
+          items: [],
+          settings: {
+            // lower third settings
+            lowerThirdBg: "./images/lowerThird.png",
+            lowerThirdResize: true,
+            lowerThirdCenter: false,
+            lowerThirdTitleFontSize: 64,
+            lowerThirdTitleColor: "#FFFFFF",
+            lowerThirdTitleX: 30,
+            lowerThirdTitleY: 8,
+            lowerThirdDescriptionFontSize: 24,
+            lowerThirdDescriptionColor: "#8D8F8E",
+            lowerThirdDescriptionX: 30,
+            lowerThirdDescriptionY: 105,
+          }
+        };
+        if (this.lowerThirds === null) {
+          this.lowerThirds = [];
+        }
+        this.lowerThirds.unshift(template);
+        this.$store.dispatch("save");
+        this.goToItemInfo(template);
+      });
+    },
+    goToItemInfo(itemInfo) {
+      this.$router.push("/lowerthird/" + itemInfo.id);
+    },
     mute() {
       ipcRenderer.invoke("mute");
     },
     openWindow() {
-      ipcRenderer.send("showProjection", this.settings);
+      ipcRenderer.send("showProjection", this.$store.getters.settingsAndTemplates);
     },
     scrollToCurrentItem() {
       setTimeout(() => {

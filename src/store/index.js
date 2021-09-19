@@ -20,21 +20,10 @@ export default new Vuex.Store({
       strokeSize: 2,
       addShadow: false,
       centerAlign: true,
-      // lower third settings
-      lowerThirdBg: "./images/lowerThird.png",
-      lowerThirdResize: true,
-      lowerThirdCenter: false,
-      lowerThirdTitleFontSize: 64,
-      lowerThirdTitleColor: "#FFFFFF",
-      lowerThirdTitleX: 30,
-      lowerThirdTitleY: 8,
-      lowerThirdDescriptionFontSize: 24,
-      lowerThirdDescriptionColor: "#8D8F8E",
-      lowerThirdDescriptionX: 30,
-      lowerThirdDescriptionY: 105,
     }, JSON.parse(localStorage.getItem("settings"))),
     currentSubtitleEpisodeId: null,
     currentSubtitleId: null,
+    currentLowerThirdTemplateId: null,
     currentLowerThirdId: null
   },
   getters: {
@@ -49,8 +38,20 @@ export default new Vuex.Store({
       return null;
     },
     currentLowerThird: state => {
-      const currentLowerThird = state.lowerThirds.find((item) => item.id === state.currentLowerThirdId);
-      return currentLowerThird;
+      const currentEpisode = state.lowerThirds.find((ep) => ep.id === state.currentLowerThirdTemplateId);
+      if (currentEpisode) {
+        return currentEpisode.items.find((item) => item.id === state.currentLowerThirdId);
+      }
+      return null;
+    },
+    settingsAndTemplates: state => {
+      const settingsString = JSON.stringify(state.settings);
+      let allSettings = JSON.parse(settingsString);
+      allSettings.templates = {};
+      for (const template of state.lowerThirds) {
+        allSettings.templates[template.id] = template.settings;
+      }
+      return allSettings;
     }
   },
   mutations: {
@@ -62,18 +63,20 @@ export default new Vuex.Store({
       localStorage.setItem("lowerThirds", JSON.stringify(context.state.lowerThirds));
     },
     updateSettings(context) {
-      localStorage.setItem("settings", JSON.stringify(context.state.settings));
-      //console.log(context.state.settings);
-      ipcRenderer.send("updateSettings", context.state.settings);
+      const settingsString = JSON.stringify(context.state.settings);
+      localStorage.setItem("settings", settingsString);
+      //send settings and all the lower third templates over to the projection page
+      ipcRenderer.send("updateSettings", context.getters.settingsAndTemplates);
     },
     showSubtitle(context, {episodeId, lyricsId}) {
       context.state.currentSubtitleEpisodeId = episodeId;
       context.state.currentSubtitleId = lyricsId;
       ipcRenderer.send("showSubtitle", context.getters.currentSubtitle);
     },
-    showLowerThird(context, identifer) {
-      context.state.currentLowerThirdId = identifer;
-      ipcRenderer.send("showLowerThird", context.getters.currentLowerThird);
+    showLowerThird(context, {templateId, itemId}) {
+      context.state.currentLowerThirdTemplateId = templateId;
+      context.state.currentLowerThirdId = itemId;
+      ipcRenderer.send("showLowerThird", {templateId: templateId, item: context.getters.currentLowerThird});
     },
     previousSubtitle(context) {
       const currentEpisode = context.state.episodes.find((ep) => ep.id === context.state.currentSubtitleEpisodeId);

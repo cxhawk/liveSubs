@@ -38,52 +38,12 @@
           </el-form-item>
         </el-form>
       </el-tab-pane>
-      <el-tab-pane label="Lower third" name="lower">
-        <el-form label-position="right" label-width="130px">
-          <el-form-item label="Background Image">
-            <el-image :src="settings.lowerThirdBg" fit="contain"></el-image>
-            <el-input v-model="settings.lowerThirdBg" @change="update" readonly>
-              <el-button slot="prepend" @click="resetImage">Default</el-button>
-              <el-button slot="append" icon="el-icon-search" @click="locateImage">Browse</el-button>
-            </el-input>
-          </el-form-item>
-          <el-form-item label="Resize if needed (repeat middle 1/3)">
-            <el-switch v-model="settings.lowerThirdResize" @change="update"></el-switch>
-          </el-form-item>
-          <el-form-item label="Center Align">
-            <el-switch v-model="settings.lowerThirdCenter" @change="update"></el-switch>
-          </el-form-item>
-          <el-form-item label="Title Size">
-            <el-input-number v-model="settings.lowerThirdTitleFontSize" @change="update" :min="10" :max="100"></el-input-number>
-          </el-form-item>
-          <el-form-item label="Title Color">
-            <el-color-picker v-model="settings.lowerThirdTitleColor" :predefine="['#FFFFFF']" @change="update"></el-color-picker>
-          </el-form-item>
-          <el-form-item label="Title Offset (X,Y)">
-            <el-input-number v-model="settings.lowerThirdTitleX" @change="update" :min="0"></el-input-number>&nbsp;
-            <el-input-number v-model="settings.lowerThirdTitleY" @change="update" :min="0" :max="200"></el-input-number>&nbsp;
-            <el-switch v-model="settings.lowerThirdTitleCenter" @change="update" active-text="Center"></el-switch>
-          </el-form-item>
-          <el-form-item label="Description Size">
-            <el-input-number v-model="settings.lowerThirdDescriptionFontSize" @change="update" :min="10" :max="100"></el-input-number>
-          </el-form-item>
-          <el-form-item label="Description Color">
-            <el-color-picker v-model="settings.lowerThirdDescriptionColor" :predefine="['#FFFFFF']" @change="update"></el-color-picker>
-          </el-form-item>
-          <el-form-item label="Description Offset (X,Y)">
-            <el-input-number v-model="settings.lowerThirdDescriptionX" @change="update" :min="0"></el-input-number>&nbsp;
-            <el-input-number v-model="settings.lowerThirdDescriptionY" @change="update" :min="0"></el-input-number>&nbsp;
-            <el-switch v-model="settings.lowerThirdDescriptionCenter" @change="update" active-text="Center"></el-switch>
-          </el-form-item>
-        </el-form>
-      </el-tab-pane>
     </el-tabs>
   </div>
 </template>
 
 <script>
 import { mapFields } from 'vuex-map-fields';
-const { ipcRenderer } = window.require('electron');
 
 export default {
   name: 'Home',
@@ -101,28 +61,6 @@ export default {
     update() {
       this.$store.dispatch("updateSettings");
     },
-    locateImage() {
-      ipcRenderer.invoke("openImage").then((path) => {
-        this.settings.lowerThirdBg = "atom://" + path;
-        this.update();
-      });
-    },
-    resetImage() {
-      Object.assign(this.settings, {
-        lowerThirdBg: "./images/lowerThird.png",
-        lowerThirdResize: true,
-        lowerThirdCenter: false,
-        lowerThirdTitleFontSize: 64,
-        lowerThirdTitleColor: "#FFFFFF",
-        lowerThirdTitleX: 30,
-        lowerThirdTitleY: 8,
-        lowerThirdDescriptionFontSize: 24,
-        lowerThirdDescriptionColor: "#8D8F8E",
-        lowerThirdDescriptionX: 30,
-        lowerThirdDescriptionY: 105,
-      });
-      this.update();
-    }
   }
 }
 </script>

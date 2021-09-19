@@ -20,20 +20,9 @@ let settings = {
 	addShadow: false,
 	centerAlign: true,
 	// lower third settings
-	lowerThirdBg: "./images/lowerThird.png",
-	lowerThirdResize: true,
-  lowerThirdCenter: false,
-	lowerThirdTitleFontSize: 64,
-	lowerThirdTitleColor: "#FFFFFF",
-	lowerThirdTitleX: 30,
-	lowerThirdTitleY: 8,
-	lowerThirdDescriptionFontSize: 24,
-	lowerThirdDescriptionColor: "#8D8F8E",
-	lowerThirdDescriptionX: 30,
-	lowerThirdDescriptionY: 105,
-	lowerThirdTitleCenter: false,
-	lowerThirdDescriptionCenter: false
+	templates: {}
 };
+let currentLowerThirdTemplateId = null;
 
 window.onload = function () {
 	const { ipcRenderer } = window.require('electron');
@@ -54,15 +43,17 @@ window.onload = function () {
 	}
 	// events from electron
 	ipcRenderer.on("showLowerThird", (event, arg) => {
-		if (arg && arg.title) {
+		if (arg && arg.templateId) {
 			console.log("showLowerThird");
-			lowerThirdHeader.text = arg.title;
-			lowerThirdDescription.text = arg.description;
+			console.log(arg);
+			currentLowerThirdTemplateId = arg.templateId;
+			lowerThirdHeader.text = arg.item.title;
+			lowerThirdDescription.text = arg.item.description;
 			lowerThird.visible = true;
 			lowerThird.alpha = 0;
 			lowerThirdAnimation.animating = true;
 			lowerThirdAnimation.startTime = performance.now();
-			layout();
+			updateTexture();
 		} else {
 			console.log("hide showLowerThird");
 			lowerThird.visible = false;
@@ -77,6 +68,7 @@ window.onload = function () {
 	});
 	ipcRenderer.on("updateSettings", (event, arg) => {
 		settings = arg;
+		console.log(settings);
 		subtitle.style = {
 			fontFamily: '"Noto Sans", "Noto Sans SC", sans-serif', 
 			fontSize: arg.fontSize,
@@ -88,18 +80,6 @@ window.onload = function () {
 			dropShadowDistance: arg.strokeSize,
 			fill: arg.color,
 		};
-		lowerThirdHeader.style = {
-			fontFamily: '"Noto Sans", "Noto Sans SC", sans-serif', 
-			fontSize: arg.lowerThirdTitleFontSize,
-			fontWeight: 700,
-			fill: arg.lowerThirdTitleColor, 
-		};
-		lowerThirdDescription.style = {
-			fontFamily: '"Noto Sans", "Noto Sans SC", sans-serif', 
-			fontSize: arg.lowerThirdDescriptionFontSize,
-			fontWeight: 300,
-			fill: arg.lowerThirdDescriptionColor,
-		}
 		updateTexture();
 	});
 }
@@ -124,7 +104,24 @@ function initPIXI() {
 }
 
 function updateTexture() {
-	PIXI.Texture.fromURL(settings.lowerThirdBg).then((bgTexture) => {
+	const currentTemplate = settings.templates[currentLowerThirdTemplateId];
+	if (!currentTemplate) {
+		return;
+	}
+	lowerThirdHeader.style = {
+		fontFamily: '"Noto Sans", "Noto Sans SC", sans-serif', 
+		fontSize: currentTemplate.lowerThirdTitleFontSize,
+		fontWeight: 700,
+		fill: currentTemplate.lowerThirdTitleColor, 
+	};
+	lowerThirdDescription.style = {
+		fontFamily: '"Noto Sans", "Noto Sans SC", sans-serif', 
+		fontSize: currentTemplate.lowerThirdDescriptionFontSize,
+		fontWeight: 300,
+		fill: currentTemplate.lowerThirdDescriptionColor,
+	}
+
+	PIXI.Texture.fromURL(currentTemplate.lowerThirdBg).then((bgTexture) => {
 		lowerThird.removeChildren();
 		lowerThirdTexture = bgTexture;
 		const oneThirdOfWidth = Math.floor(bgTexture.width / 3);
@@ -155,6 +152,7 @@ function updateTexture() {
 }
 
 function layout() {
+	const currentTemplate = settings.templates[currentLowerThirdTemplateId];
 	const w = window.innerWidth;
 	const h = window.innerHeight;
 
@@ -167,13 +165,13 @@ function layout() {
 		subtitle.anchor.x = 0;
 	}
 
-	if (lowerThirdBg1) {
-		lowerThirdHeader.x = settings.lowerThirdTitleX;
-		lowerThirdHeader.y = settings.lowerThirdTitleY;
-		lowerThirdDescription.x = settings.lowerThirdDescriptionX;
-		lowerThirdDescription.y = settings.lowerThirdDescriptionY;
-		lowerThirdHeader.anchor.x = settings.lowerThirdTitleCenter ? 0.5: 0;
-		lowerThirdDescription.anchor.x = settings.lowerThirdDescriptionCenter ? 0.5: 0;
+	if (lowerThirdBg1 && currentTemplate) {
+		lowerThirdHeader.x = currentTemplate.lowerThirdTitleX;
+		lowerThirdHeader.y = currentTemplate.lowerThirdTitleY;
+		lowerThirdDescription.x = currentTemplate.lowerThirdDescriptionX;
+		lowerThirdDescription.y = currentTemplate.lowerThirdDescriptionY;
+		lowerThirdHeader.anchor.x = currentTemplate.lowerThirdTitleCenter ? 0.5: 0;
+		lowerThirdDescription.anchor.x = currentTemplate.lowerThirdDescriptionCenter ? 0.5: 0;
 
 		const metricsHeader = PIXI.TextMetrics.measureText(lowerThirdHeader.text, lowerThirdHeader.style);
 		const metricsDescription = PIXI.TextMetrics.measureText(lowerThirdDescription.text, lowerThirdDescription.style);
@@ -187,23 +185,18 @@ function layout() {
 		lowerThirdBg3.x = lowerThirdBg1.width + lowerThirdBg2.width;
 		
 		lowerThirdBg.x = 0;
-		lowerThirdBg.visible = !settings.lowerThirdResize;
-		lowerThirdBg1.visible = settings.lowerThirdResize;
-		lowerThirdBg2.visible = settings.lowerThirdResize;
-		lowerThirdBg3.visible = settings.lowerThirdResize;
+		lowerThirdBg.visible = !currentTemplate.lowerThirdResize;
+		lowerThirdBg1.visible = currentTemplate.lowerThirdResize;
+		lowerThirdBg2.visible = currentTemplate.lowerThirdResize;
+		lowerThirdBg3.visible = currentTemplate.lowerThirdResize;
 		
-		// console.log("lowerThirdBg1.width " + lowerThirdBg1.width);
-		// console.log("lowerThirdBg3.width " + lowerThirdBg3.width);
-		// console.log("lowerThirdHeader.position " + lowerThirdHeader.position);
-		// console.log("mw:" + middleWidth);
-		// console.log(metricsHeader.width + " " + metricsDescription.width);
-		// console.log(lowerThirdBg1.width + "/" + lowerThirdBg2.width + "/" + lowerThirdBg3.x);
-		
-		if (settings.lowerThirdCenter) {
+		if (currentTemplate.lowerThirdCenter) {
 			lowerThird.x = (w - lowerThird.width) / 2;
 		} else {
 			lowerThird.x = 50;
 		}
+
+		console.log(lowerThirdHeader);
 		
 		lowerThird.y = h - (lowerThirdTexture.height + 50);
 	}
