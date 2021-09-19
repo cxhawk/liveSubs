@@ -137,7 +137,7 @@ export default {
       this.$store.dispatch("showSubtitle", {episodeId: null, lyricsId: null});
     })
     ipcRenderer.on("clearLowerThird", () => {
-      this.$store.dispatch("showLowerThird", null);
+      this.$store.dispatch("showLowerThird", {templateId: null, itemId: null});
     })
   },
   mounted() {
