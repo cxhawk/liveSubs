@@ -8,6 +8,13 @@ Wanna add subtitles and lower third easily in your live stream? This tool is gre
 - Use keyboard shortcut keys to control the display content.
 - Available on macOS, Windows and Raspbian.
 
+## Tutorial
+1. Launch app on your computer and then press Ctrl/Command + O to open the projection window (green screen)
+2. If you have a output with FHD resolution it should automatically went fullscreen on it. If not, you have to drag the projection window on to the target area and then double click the content area to go fullscreen. 
+3. To show subtitles: in the main window, click on the + button in the subtitle section to add an episode (song/program/piece).
+4. To show lower third, click on the + button in the lower third section to add an template. It will give you a default look, but you can customize it in the settings in it.
+5. Click on an item in the table to show it, press Ctrl/Command + 1 or 2 to clear lower third or subtitles. If you want to temporarily hide everything, you can press Ctrl/Command + 0 to toggle the mute state.
+
 ## Screenshots
 
 setup subtitle and lower third format
@@ -23,16 +30,15 @@ default lower third on projection window
 <img width="2048" alt="Screen Shot 2021-09-17 at 3 05 15 PM" src="https://user-images.githubusercontent.com/14524765/133858584-5293eb18-251a-48b0-8139-6a3eba07430c.png">
 
 ## Compile from sources
+This project is based on Electron + ElementUI + PIXI. Make sure you have nodejs v14 installed and then run:
 ```
 npm install
 ```
-
-### Compiles and hot-reloads for development
+Compiles and hot-reloads for development
 ```
 npm run electron:serve
 ```
-
-### Compiles and minifies for production
+Compiles for production
 ```
 npm run electron:build
 ```
