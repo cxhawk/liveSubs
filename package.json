@@ -1,6 +1,6 @@
 {
   "name": "livesubs",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "description": "live subtitles on a chroma key",
   "author": "hawk",
   "private": true,

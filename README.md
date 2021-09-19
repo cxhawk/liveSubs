@@ -1,6 +1,12 @@
 # Live Subtitles and Lower Third
 
-Wanna add live subtitles and lower third easily on your live stream? This tool is great to be used with a video switcher like the ATEM MINIs.
+Wanna add subtitles and lower third easily in your live stream? This tool is great to be used with a video switcher like the ATEM MINIs.
+
+## Features
+- Import subtitles by lines in a batch and go through them one by one
+- Design multiple lower third templates with background image and text format.
+- Use keyboard shortcut keys to control the display content.
+- Available on macOS, Windows and Raspbian.
 
 ## Screenshots
 

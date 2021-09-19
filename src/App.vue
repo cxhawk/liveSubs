@@ -13,13 +13,18 @@
                   <span style="font-size: 20px; font-weight:700;">Live Subs</span>
                 </el-row>
                 <el-row>
-                  <span style="font-size: 14px; font-weight:300;">现场抠像字幕</span>
+                  <span style="font-size: 14px; font-weight:300; color: lightgray">现场抠像字幕</span>
                 </el-row>
               </el-col>
             </el-row>
           </el-col>
-          <el-col class="preview" v-if="currentSubtitleText">
-            {{currentSubtitleText}}
+          <el-col>
+            <el-row class="previewLine1">
+              {{currentSubtitleText}}
+            </el-row>
+            <el-row class="previewLine2">
+              {{currentLowerThirdTitle}}
+            </el-row>
           </el-col>
           <el-col>
             <div style="float: right">
@@ -353,14 +358,20 @@ export default {
   .activeItem {
     color: rgb(255, 90, 90) !important;
   }
-  .preview {
+  .previewLine1 {
     text-align: center;
     color: snow;
     font-family: "Noto Sans", "Noto Sans SC";
-    font-size: 17px;
+    font-size: 15px;
     text-overflow: ellipsis;
-    display: -webkit-box;
-    -webkit-line-clamp: 2; /* number of lines to show */
-    -webkit-box-orient: vertical;
+    height: 25px;
+  }
+  .previewLine2 {
+    text-align: center;
+    color:lightgray;
+    font-family: "Noto Sans", "Noto Sans SC";
+    font-size: 15px;
+    text-overflow: ellipsis;
+    height: 25px;
   }
 </style>
