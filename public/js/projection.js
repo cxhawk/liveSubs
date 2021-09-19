@@ -53,7 +53,7 @@ window.onload = function () {
 			lowerThird.alpha = 0;
 			lowerThirdAnimation.animating = true;
 			lowerThirdAnimation.startTime = performance.now();
-			updateTexture();
+			update();
 		} else {
 			console.log("hide showLowerThird");
 			lowerThird.visible = false;
@@ -80,7 +80,7 @@ window.onload = function () {
 			dropShadowDistance: arg.strokeSize,
 			fill: arg.color,
 		};
-		updateTexture();
+		update();
 	});
 }
 
@@ -103,52 +103,56 @@ function initPIXI() {
 	document.body.appendChild(app.view);
 }
 
-function updateTexture() {
+function update() {
 	const currentTemplate = settings.templates[currentLowerThirdTemplateId];
-	if (!currentTemplate) {
-		return;
-	}
-	lowerThirdHeader.style = {
-		fontFamily: '"Noto Sans", "Noto Sans SC", sans-serif', 
-		fontSize: currentTemplate.lowerThirdTitleFontSize,
-		fontWeight: 700,
-		fill: currentTemplate.lowerThirdTitleColor, 
-	};
-	lowerThirdDescription.style = {
-		fontFamily: '"Noto Sans", "Noto Sans SC", sans-serif', 
-		fontSize: currentTemplate.lowerThirdDescriptionFontSize,
-		fontWeight: 300,
-		fill: currentTemplate.lowerThirdDescriptionColor,
-	}
 
-	PIXI.Texture.fromURL(currentTemplate.lowerThirdBg).then((bgTexture) => {
-		lowerThird.removeChildren();
-		lowerThirdTexture = bgTexture;
-		const oneThirdOfWidth = Math.floor(bgTexture.width / 3);
-		
-		lowerThirdBg = new PIXI.Sprite(bgTexture);
-		const texture1 = bgTexture.clone();
-		texture1.frame = new PIXI.Rectangle(0, 0, oneThirdOfWidth, bgTexture.height);
-		lowerThirdBg1 = new PIXI.Sprite(texture1);
-		
-		lowerThird.addChild(lowerThirdBg);
-		lowerThird.addChild(lowerThirdBg1);
-
-		const texture2 = bgTexture.clone();
-		texture2.frame = new PIXI.Rectangle(oneThirdOfWidth, 0, 10, bgTexture.height);
-		lowerThirdBg2 = new PIXI.TilingSprite(texture2, 300, bgTexture.height);
-		lowerThird.addChild(lowerThirdBg2);
-
-		const texture3 = bgTexture.clone();
-		texture3.frame = new PIXI.Rectangle(bgTexture.width - (oneThirdOfWidth * 2), 0, oneThirdOfWidth, bgTexture.height);
-		lowerThirdBg3 = new PIXI.Sprite(texture3);
-		lowerThird.addChild(lowerThirdBg3);
-
-		lowerThird.addChild(lowerThirdHeader);
-		lowerThird.addChild(lowerThirdDescription);
-
+	if (currentTemplate) {
+		lowerThirdHeader.style = {
+			fontFamily: '"Noto Sans", "Noto Sans SC", sans-serif', 
+			fontSize: currentTemplate.lowerThirdTitleFontSize,
+			fontWeight: 700,
+			fill: currentTemplate.lowerThirdTitleColor, 
+		};
+		lowerThirdDescription.style = {
+			fontFamily: '"Noto Sans", "Noto Sans SC", sans-serif', 
+			fontSize: currentTemplate.lowerThirdDescriptionFontSize,
+			fontWeight: 300,
+			fill: currentTemplate.lowerThirdDescriptionColor,
+		};
+		PIXI.Texture.fromURL(currentTemplate.lowerThirdBg).then(bgTexture => {
+			lowerThird.removeChildren();
+			lowerThirdTexture = bgTexture;
+			const oneThirdOfWidth = Math.floor(bgTexture.width / 3);
+			
+			lowerThirdBg = new PIXI.Sprite(bgTexture);
+			const texture1 = bgTexture.clone();
+			texture1.frame = new PIXI.Rectangle(0, 0, oneThirdOfWidth, bgTexture.height);
+			lowerThirdBg1 = new PIXI.Sprite(texture1);
+			
+			lowerThird.addChild(lowerThirdBg);
+			lowerThird.addChild(lowerThirdBg1);
+	
+			const texture2 = bgTexture.clone();
+			texture2.frame = new PIXI.Rectangle(oneThirdOfWidth, 0, 10, bgTexture.height);
+			lowerThirdBg2 = new PIXI.TilingSprite(texture2, 300, bgTexture.height);
+			lowerThird.addChild(lowerThirdBg2);
+	
+			const texture3 = bgTexture.clone();
+			texture3.frame = new PIXI.Rectangle(bgTexture.width - (oneThirdOfWidth * 2), 0, oneThirdOfWidth, bgTexture.height);
+			lowerThirdBg3 = new PIXI.Sprite(texture3);
+			lowerThird.addChild(lowerThirdBg3);
+	
+			lowerThird.addChild(lowerThirdHeader);
+			lowerThird.addChild(lowerThirdDescription);
+	
+			layout();
+		}).catch(error => {
+			console.warn(error);
+			layout();
+		});
+	} else {
 		layout();
-	});
+	}
 }
 
 function layout() {
@@ -195,8 +199,6 @@ function layout() {
 		} else {
 			lowerThird.x = 50;
 		}
-
-		console.log(lowerThirdHeader);
 		
 		lowerThird.y = h - (lowerThirdTexture.height + 50);
 	}

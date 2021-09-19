@@ -11,12 +11,12 @@
           </el-button>
         </el-tooltip>
       </el-col>
-      <el-col style="width: 110px">
+      <el-col style="width: 120px">
         <el-button icon="el-icon-plus" size="small" @click="importLines"
-          >Import
+          >Import Lines
         </el-button>
       </el-col>
-      <el-col style="width: 110px">
+      <el-col style="width: 120px">
         <el-popconfirm title="Are you sure？" @confirm="removeAll">
           <el-button icon="el-icon-delete" size="small" slot="reference"
             >Remove All</el-button
