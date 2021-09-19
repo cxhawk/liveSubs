@@ -200,6 +200,7 @@ export default {
         }
         this.lowerThirds.unshift(template);
         this.$store.dispatch("save");
+        this.$store.dispatch("updateSettings");
         this.goToItemInfo(template);
       });
     },
