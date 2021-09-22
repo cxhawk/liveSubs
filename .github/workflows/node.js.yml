@@ -1,4 +1,4 @@
-name: Build/release
+name: Build
 
 on: push
 
@@ -8,7 +8,7 @@ jobs:
 
     strategy:
       matrix:
-        os: [macos-latest, windows-latest]
+        os: [macos-latest]
 
     steps:
       - name: Check out Git repository
