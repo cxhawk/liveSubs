@@ -146,6 +146,7 @@ async function createWindow() {
     width: 1024,
     height: 768,
     backgroundColor: '#1e222d',
+    show: false,
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
@@ -161,6 +162,10 @@ async function createWindow() {
     // Load the index.html when not in development
     mainWindow.loadURL('app://./index.html')
   }
+
+  mainWindow.on("ready-to-show", () => {
+    mainWindow.show()
+  })
 }
 
 // Quit when all windows are closed.
