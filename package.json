@@ -2,7 +2,7 @@
   "name": "livesubs",
   "version": "1.2.3",
   "description": "live subtitles on a chroma key",
-  "author": "hawk",
+  "author": "Maizesoft",
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
