@@ -28,12 +28,12 @@
           </el-col>
           <el-col>
             <div style="float: right">
-              <el-tooltip content="Hide all contents on projection window temporarily (⌘+0)" placement="top" effect="light">
+              <el-tooltip content="Hide all contents on projection window temporarily (⌘+0)" effect="light">
                 <el-button :type="muted ? 'danger' : 'plain'" size="small" icon="el-icon-circle-close" @click="mute">
                   MUTE
                 </el-button>
               </el-tooltip>
-              <el-tooltip content="Open the projection window (⌘+O)" placement="bottom" effect="light">
+              <el-tooltip content="Open the projection window (⌘+O)" effect="light">
                 <el-button size="small" type="primary" icon="el-icon-monitor" @click="openWindow">
                   OPEN
                 </el-button>
@@ -258,55 +258,6 @@ export default {
       border-radius: 10px;
       background: rgba(0,0,0,0.5); 
   }
-
-  @font-face {
-    font-family: "Noto Sans SC";
-    font-weight: 300;
-    font-display: auto;
-    src: url("./assets/fonts/NotoSansSC-Light.otf");
-  }
-  @font-face {
-    font-family: "Noto Sans SC";
-    font-weight: 400;
-    font-display: auto;
-    src: url("./assets/fonts/NotoSansSC-Regular.otf");
-  }
-  @font-face {
-    font-family: "Noto Sans SC";
-    font-weight: 700;
-    font-display: auto;
-    src: url("./assets/fonts/NotoSansSC-Bold.otf");
-  }
-  @font-face {
-    font-family: "Noto Sans SC";
-    font-weight: 900;
-    font-display: auto;
-    src: url("./assets/fonts/NotoSansSC-Black.otf");
-  }
-  @font-face {
-    font-family: "Noto Sans";
-    font-weight: 300;
-    font-display: auto;
-    src: url("./assets/fonts/NotoSans-Light.ttf");
-  }
-  @font-face {
-    font-family: "Noto Sans";
-    font-weight: 400;
-    font-display: auto;
-    src: url("./assets/fonts/NotoSans-Regular.ttf");
-  }
-  @font-face {
-    font-family: "Noto Sans";
-    font-weight: 700;
-    font-display: auto;
-    src: url("./assets/fonts/NotoSans-Bold.ttf");
-  }
-  @font-face {
-    font-family: "Noto Sans";
-    font-weight: 900;
-    font-display: auto;
-    src: url("./assets/fonts/NotoSans-Black.ttf");
-  }
   
   body {
     margin: 0;
@@ -314,7 +265,7 @@ export default {
     position: fixed;
     overflow: hidden;
     overscroll-behavior-y: none;
-    font-family: "helvetica", "Noto Sans", "Noto Sans SC", sans-serif;
+    font-family: "Helvetica Neue",Helvetica,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","微软雅黑",Arial,sans-serif;
   }
   .top {
     background-color: #272f3f;
@@ -361,7 +312,6 @@ export default {
   .previewLine1 {
     text-align: center;
     color: snow;
-    font-family: "Noto Sans", "Noto Sans SC";
     font-size: 15px;
     text-overflow: ellipsis;
     height: 25px;
@@ -369,7 +319,6 @@ export default {
   .previewLine2 {
     text-align: center;
     color:lightgray;
-    font-family: "Noto Sans", "Noto Sans SC";
     font-size: 15px;
     text-overflow: ellipsis;
     height: 25px;

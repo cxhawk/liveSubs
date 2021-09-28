@@ -17,6 +17,7 @@
             <el-select v-model="settings.fontWeight" @change="update">
               <el-option label="light" value="300"></el-option>
               <el-option label="normal" value="400"></el-option>
+              <el-option label="semi bold" value="600"></el-option>
               <el-option label="bold" value="700"></el-option>
               <el-option label="black" value="900"></el-option>
             </el-select>

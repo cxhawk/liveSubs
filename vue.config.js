@@ -7,6 +7,7 @@ module.exports = {
 				"productName": "LiveSubs",
 				"afterSign": "build/provisioning/notarize.js",
 				mac: {
+					"target": "dmg",
 					"hardenedRuntime": true,
 					"provisioningProfile": "build/provisioning/LiveSubsDevIDApp.provisionprofile",
 					"entitlements": "build/provisioning/mac.entitlement",

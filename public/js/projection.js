@@ -1,3 +1,6 @@
+const FontFaceObserver = require('fontfaceobserver');
+import * as PIXI from './pixi.min.mjs';
+
 let app = new PIXI.Application({
 	width: 1920, height: 1080, backgroundAlpha: 0, resolution: 1, resizeTo: window
 });
@@ -8,10 +11,11 @@ let lowerThirdDescription = new PIXI.Text();
 let lowerThirdTexture = null;
 let lowerThirdBg = null, lowerThirdBg1 = null, lowerThirdBg2 = null, lowerThirdBg3 = null;
 let lowerThirdAnimation = {animating: false, startTime: 0};
+const fontList = "Alibaba PuHuiTi 2.0";
 let settings = {
 	backgroundColor: "#009933",
 	// subtitle settings
-	fontFamily: "Noto Sans SC",
+	fontFamily: fontList,
 	fontSize: 50,
 	fontWeight: "700",
 	color: "#FFFFFF",
@@ -68,19 +72,25 @@ window.onload = function () {
 	});
 	ipcRenderer.on("updateSettings", (event, arg) => {
 		settings = arg;
-		console.log(settings);
-		subtitle.style = {
-			fontFamily: '"Noto Sans", "Noto Sans SC", sans-serif', 
-			fontSize: arg.fontSize,
-			fontWeight: arg.fontWeight,
-			stroke: arg.strokeColor,
-			strokeThickness: arg.strokeSize,
-			dropShadow: arg.addShadow,
-			dropShadowColor: arg.strokeColor,
-			dropShadowDistance: arg.strokeSize,
-			fill: arg.color,
-		};
-		update();
+		const fontLoader = new FontFaceObserver(fontList, {weight: arg.fontWeight});
+		fontLoader.load().then(() => {
+
+		}).catch(() => {
+			console.log("unable to load font: " + fontList);
+		}).finally(() => {
+			subtitle.style = {
+				fontFamily: fontList, 
+				fontSize: arg.fontSize,
+				fontWeight: arg.fontWeight,
+				stroke: arg.strokeColor,
+				strokeThickness: arg.strokeSize,
+				dropShadow: arg.addShadow,
+				dropShadowColor: arg.strokeColor,
+				dropShadowDistance: arg.strokeSize,
+				fill: arg.color,
+			};
+			update();
+		});
 	});
 }
 
@@ -108,13 +118,13 @@ function update() {
 
 	if (currentTemplate) {
 		lowerThirdHeader.style = {
-			fontFamily: '"Noto Sans", "Noto Sans SC", sans-serif', 
+			fontFamily: fontList, 
 			fontSize: currentTemplate.lowerThirdTitleFontSize,
 			fontWeight: 700,
 			fill: currentTemplate.lowerThirdTitleColor, 
 		};
 		lowerThirdDescription.style = {
-			fontFamily: '"Noto Sans", "Noto Sans SC", sans-serif', 
+			fontFamily: fontList, 
 			fontSize: currentTemplate.lowerThirdDescriptionFontSize,
 			fontWeight: 300,
 			fill: currentTemplate.lowerThirdDescriptionColor,

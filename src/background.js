@@ -153,6 +153,10 @@ async function createWindow() {
     }
   })
 
+  mainWindow.on("ready-to-show", () => {
+    mainWindow.show()
+  })
+
   if (process.env.WEBPACK_DEV_SERVER_URL) {
     // Load the url of the dev server if in development mode
     await mainWindow.loadURL(process.env.WEBPACK_DEV_SERVER_URL)
@@ -162,10 +166,6 @@ async function createWindow() {
     // Load the index.html when not in development
     mainWindow.loadURL('app://./index.html')
   }
-
-  mainWindow.on("ready-to-show", () => {
-    mainWindow.show()
-  })
 }
 
 // Quit when all windows are closed.
