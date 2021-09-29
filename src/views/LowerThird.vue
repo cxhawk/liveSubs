@@ -95,7 +95,7 @@
         <el-button type="danger" size="small" @click="deleteEpisode">Delete</el-button>
       </el-col>
     </el-row>
-    <el-dialog title="Import Lower Third" :visible.sync="importDialogVisible" width="70%">
+    <el-dialog title="Import Lower Third" :visible.sync="importDialogVisible" width="70%" :close-on-click-modal="false">
       <el-input
         type="textarea"
         :autosize="{ minRows: 5, maxRows: 20 }"
@@ -111,7 +111,7 @@
         >
       </span>
     </el-dialog>
-		<el-dialog title="Item" :visible.sync="isEditing" width="70%" v-if="isEditing">
+		<el-dialog title="Item" :visible.sync="isEditing" width="70%" v-if="isEditing" :close-on-click-modal="false">
       <el-input
         placeholder="title"
         v-model="editingItem.title"

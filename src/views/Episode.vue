@@ -59,7 +59,7 @@
         <el-button type="danger" size="small" @click="deleteEpisode">Delete</el-button>
       </el-col>
     </el-row>
-    <el-dialog title="Import Lines" :visible.sync="importDialogVisible" width="70%">
+    <el-dialog title="Import Lines" :visible.sync="importDialogVisible" width="70%" :close-on-click-modal="false">
       <el-input
         type="textarea"
         :autosize="{ minRows: 5, maxRows: 20 }"
@@ -144,7 +144,7 @@ export default {
     },
     editLine(row, event) {
       event.stopPropagation();
-      MessageBox.prompt("", "Edit", {inputValue: row.text}).then(response => {
+      MessageBox.prompt("", "Edit", {inputValue: row.text, closeOnClickModal: false}).then(response => {
           const title = response.value;
           row.text = title;
           if (row.id === this.currentSubtitleId) {
@@ -157,7 +157,7 @@ export default {
       event.stopPropagation();
       const index = this.indexOfRow(row);
       if (index >= 0) {
-        MessageBox.prompt("Add one line before", "Insert").then(response => {
+        MessageBox.prompt("Add one line before", "Insert", {closeOnClickModal: false}).then(response => {
           const text = response.value;
           const identifier = nanoid();
           const lyric = {
