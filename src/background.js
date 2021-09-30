@@ -61,7 +61,9 @@ async function showProjection(settings) {
     projectionWindow = new BrowserWindow({
       fullscreenable: true, 
       backgroundColor: settings.backgroundColor, 
-      show: false, 
+      show: false,
+      width: 1920,
+      height: 1080,
       autoHideMenuBar: true,
       webPreferences: {
         nodeIntegration: true,
@@ -93,8 +95,10 @@ async function showProjection(settings) {
       if (muted && !hideAllCSSKey) {
         toggleHideAll()
       }
-      showSubtitle(currentSubtitle)
-      showLowerThird(currentLowerThird)
+      setTimeout(() => {
+        showSubtitle(currentSubtitle)
+        showLowerThird(currentLowerThird)
+      }, 500)
 
       projectionWindow.show()
     })

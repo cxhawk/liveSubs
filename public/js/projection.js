@@ -57,7 +57,7 @@ window.onload = function () {
 			lowerThird.alpha = 0;
 			lowerThirdAnimation.animating = true;
 			lowerThirdAnimation.startTime = performance.now();
-			update();
+			updateLowerThird();
 		} else {
 			console.log("hide showLowerThird");
 			lowerThird.visible = false;
@@ -89,7 +89,7 @@ window.onload = function () {
 				dropShadowDistance: arg.strokeSize,
 				fill: arg.color,
 			};
-			update();
+			updateLowerThird();
 		});
 	});
 }
@@ -113,52 +113,57 @@ function initPIXI() {
 	document.body.appendChild(app.view);
 }
 
-function update() {
+// update lower third background texture and font style
+function updateLowerThird() {
 	const currentTemplate = settings.templates[currentLowerThirdTemplateId];
 
 	if (currentTemplate) {
-		lowerThirdHeader.style = {
-			fontFamily: fontList, 
-			fontSize: currentTemplate.lowerThirdTitleFontSize,
-			fontWeight: 700,
-			fill: currentTemplate.lowerThirdTitleColor, 
-		};
-		lowerThirdDescription.style = {
-			fontFamily: fontList, 
-			fontSize: currentTemplate.lowerThirdDescriptionFontSize,
-			fontWeight: 300,
-			fill: currentTemplate.lowerThirdDescriptionColor,
-		};
-		PIXI.Texture.fromURL(currentTemplate.lowerThirdBg).then(bgTexture => {
-			lowerThird.removeChildren();
-			lowerThirdTexture = bgTexture;
-			const oneThirdOfWidth = Math.floor(bgTexture.width / 3);
-			
-			lowerThirdBg = new PIXI.Sprite(bgTexture);
-			const texture1 = bgTexture.clone();
-			texture1.frame = new PIXI.Rectangle(0, 0, oneThirdOfWidth, bgTexture.height);
-			lowerThirdBg1 = new PIXI.Sprite(texture1);
-			
-			lowerThird.addChild(lowerThirdBg);
-			lowerThird.addChild(lowerThirdBg1);
-	
-			const texture2 = bgTexture.clone();
-			texture2.frame = new PIXI.Rectangle(oneThirdOfWidth, 0, 10, bgTexture.height);
-			lowerThirdBg2 = new PIXI.TilingSprite(texture2, 300, bgTexture.height);
-			lowerThird.addChild(lowerThirdBg2);
-	
-			const texture3 = bgTexture.clone();
-			texture3.frame = new PIXI.Rectangle(bgTexture.width - (oneThirdOfWidth * 2), 0, oneThirdOfWidth, bgTexture.height);
-			lowerThirdBg3 = new PIXI.Sprite(texture3);
-			lowerThird.addChild(lowerThirdBg3);
-	
-			lowerThird.addChild(lowerThirdHeader);
-			lowerThird.addChild(lowerThirdDescription);
-	
-			layout();
-		}).catch(error => {
-			console.warn(error);
-			layout();
+		const fontLoader1 = new FontFaceObserver(fontList, {weight: 700});
+		const fontLoader2 = new FontFaceObserver(fontList, {weight: 300});
+		Promise.all([fontLoader1.load(), fontLoader2.load()]).finally(() => {
+			lowerThirdHeader.style = {
+				fontFamily: fontList, 
+				fontSize: currentTemplate.lowerThirdTitleFontSize,
+				fontWeight: 700,
+				fill: currentTemplate.lowerThirdTitleColor, 
+			};
+			lowerThirdDescription.style = {
+				fontFamily: fontList, 
+				fontSize: currentTemplate.lowerThirdDescriptionFontSize,
+				fontWeight: 300,
+				fill: currentTemplate.lowerThirdDescriptionColor,
+			};
+			PIXI.Texture.fromURL(currentTemplate.lowerThirdBg).then(bgTexture => {
+				lowerThird.removeChildren();
+				lowerThirdTexture = bgTexture;
+				const oneThirdOfWidth = Math.floor(bgTexture.width / 3);
+				
+				lowerThirdBg = new PIXI.Sprite(bgTexture);
+				const texture1 = bgTexture.clone();
+				texture1.frame = new PIXI.Rectangle(0, 0, oneThirdOfWidth, bgTexture.height);
+				lowerThirdBg1 = new PIXI.Sprite(texture1);
+				
+				lowerThird.addChild(lowerThirdBg);
+				lowerThird.addChild(lowerThirdBg1);
+		
+				const texture2 = bgTexture.clone();
+				texture2.frame = new PIXI.Rectangle(oneThirdOfWidth, 0, 10, bgTexture.height);
+				lowerThirdBg2 = new PIXI.TilingSprite(texture2, 300, bgTexture.height);
+				lowerThird.addChild(lowerThirdBg2);
+		
+				const texture3 = bgTexture.clone();
+				texture3.frame = new PIXI.Rectangle(bgTexture.width - (oneThirdOfWidth * 2), 0, oneThirdOfWidth, bgTexture.height);
+				lowerThirdBg3 = new PIXI.Sprite(texture3);
+				lowerThird.addChild(lowerThirdBg3);
+		
+				lowerThird.addChild(lowerThirdHeader);
+				lowerThird.addChild(lowerThirdDescription);
+		
+				layout();
+			}).catch(error => {
+				console.warn(error);
+				layout();
+			});
 		});
 	} else {
 		layout();
@@ -169,13 +174,14 @@ function layout() {
 	const currentTemplate = settings.templates[currentLowerThirdTemplateId];
 	const w = window.innerWidth;
 	const h = window.innerHeight;
+	const margin = 50;
 
-	subtitle.y = Math.round(h * 0.9);
+	subtitle.y = h - margin - settings.fontSize;
 	if (settings.centerAlign) {
 		subtitle.x = w / 2;
 		subtitle.anchor.x = 0.5;
 	} else {
-		subtitle.x = 20;
+		subtitle.x = margin;
 		subtitle.anchor.x = 0;
 	}
 
@@ -207,10 +213,10 @@ function layout() {
 		if (currentTemplate.lowerThirdCenter) {
 			lowerThird.x = (w - lowerThird.width) / 2;
 		} else {
-			lowerThird.x = 50;
+			lowerThird.x = margin;
 		}
 		
-		lowerThird.y = h - (lowerThirdTexture.height + 50);
+		lowerThird.y = h - (lowerThirdTexture.height + margin);
 	}
 }
 
