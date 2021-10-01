@@ -1,5 +1,10 @@
+const path = require('path');
+const currentPath = path.resolve(__dirname, '..', '..', 'app.asar', 'js');
+//console.log(currentPath);
+module.paths.push(currentPath);
+
 const FontFaceObserver = require('fontfaceobserver');
-import * as PIXI from './pixi.min.mjs';
+import * as PIXI from './pixi.js';
 
 let app = new PIXI.Application({
 	width: 1920, height: 1080, backgroundAlpha: 0, resolution: 1, resizeTo: window

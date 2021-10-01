@@ -62,8 +62,8 @@ async function showProjection(settings) {
       fullscreenable: true, 
       backgroundColor: settings.backgroundColor, 
       show: false,
-      width: 1920,
-      height: 1080,
+      width: 800,
+      height: 600,
       autoHideMenuBar: true,
       webPreferences: {
         nodeIntegration: true,
