@@ -10,7 +10,7 @@ Wanna add subtitles and lower third easily in your live stream? This tool is gre
 
 ## Tutorial
 1. Launch app on your computer and then press Ctrl/Command + O to open the projection window (green screen)
-2. If you have a output with FHD resolution it should automatically went fullscreen on it. If not, you have to drag the projection window on to the target area and then double click the content area to go fullscreen. 
+2. If you have a second display with FHD resolution it should automatically went fullscreen on it. If not, you have to drag the projection window on to the target area and then double click the content area to go fullscreen. 
 3. To show subtitles: in the main window, click on the + button in the subtitle section to add an episode (song/program/piece).
 4. To show lower third, click on the + button in the lower third section to add an template. It will give you a default look, but you can customize it in the settings in it.
 5. Click on an item in the table to show it, press Ctrl/Command + 1 or 2 to clear lower third or subtitles. If you want to temporarily hide everything, you can press Ctrl/Command + 0 to toggle the mute state.
