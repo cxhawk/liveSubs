@@ -2,6 +2,8 @@
 
 Wanna add subtitles and lower third easily in your live stream? This tool is great to be used with a video switcher like the ATEM Minis. Make sure this source is configured to be chroma keyed with the background color in settings.
 
+Download binaries from the [release pages](https://github.com/cxhawk/liveSubs/releases) or watch a [demo video](https://www.youtube.com/watch?v=VRKMu4GUEhE).
+
 ## Features
 - Import subtitles by lines in a batch and go through them one by one
 - Design multiple lower third templates with background image and text format.
