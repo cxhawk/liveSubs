@@ -7,6 +7,7 @@ Download binaries from the [release pages](https://github.com/cxhawk/liveSubs/re
 ## Features
 - Import subtitles by lines in a batch and go through them one by one
 - Design multiple lower third templates with background image and text format.
+- Put any picture on screen with the positions and sizes of your choice.
 - Use keyboard shortcut keys to control the display content.
 - Available on macOS, Windows and Raspbian.
 
