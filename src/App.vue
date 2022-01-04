@@ -48,7 +48,7 @@
             <el-menu-item index="/"><i class="el-icon-setting"></i>Settings</el-menu-item>
             <el-submenu index="/lowerthirds">
               <template slot="title">
-                <i class="el-icon-s-unfold"></i>
+                <i class="el-icon-bottom-left"></i>
                 <span>Lower Thirds</span>
               </template>
               <el-menu-item @click="addNewTemplate" class="episodeCell">
@@ -76,6 +76,7 @@
                 </p>
               </el-menu-item>
             </el-submenu>
+            <el-menu-item index="/images"><i class="el-icon-picture-outline"></i>Images</el-menu-item>
           </el-menu>
         </el-aside>
         <el-container>
@@ -98,7 +99,7 @@ export default {
   name: 'app',
   data() {
     return {
-      openMenu: ['/episodes'],
+      openMenu: ['/episodes', '/lowerthirds'],
       muted: false
     }
   },
@@ -144,7 +145,6 @@ export default {
     window.onkeyup = e => {
       if(e.keyCode == 32 || e.key === " ") {
         if (e.target.nodeName !== "INPUT" && e.target.nodeName !== "TEXTAREA") {
-          console.log(e);
           this.$store.dispatch("nextSubtitle");
           this.scrollToCurrentItem();
         }

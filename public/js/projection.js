@@ -7,7 +7,7 @@ const FontFaceObserver = require('fontfaceobserver');
 import * as PIXI from './pixi.js';
 
 let app = new PIXI.Application({
-	width: 1920, height: 1080, backgroundAlpha: 0, resolution: 1, resizeTo: window
+	width: 1920, height: 1080, backgroundAlpha: 0, autoDensity: true, resolution: 1, resizeTo: window
 });
 let subtitle = new PIXI.Text();
 let lowerThird = new PIXI.Container();
@@ -16,6 +16,9 @@ let lowerThirdDescription = new PIXI.Text();
 let lowerThirdTexture = null;
 let lowerThirdBg = null, lowerThirdBg1 = null, lowerThirdBg2 = null, lowerThirdBg3 = null;
 let lowerThirdAnimation = {animating: false, startTime: 0};
+let imageContainer = new PIXI.Container();
+let imageTexture = null;
+
 const fontList = "Alibaba PuHuiTi 2.0";
 let settings = {
 	backgroundColor: "#009933",
@@ -28,6 +31,8 @@ let settings = {
 	strokeSize: 2,
 	addShadow: false,
 	centerAlign: true,
+	imageAlign: "bottomLeft",
+	imageMaxSize: 0.5,
 	// lower third settings
 	templates: {}
 };
@@ -75,6 +80,21 @@ window.onload = function () {
 			subtitle.text = "";
 		}
 	});
+	ipcRenderer.on("showImage", (event, arg) => {
+		if (arg && arg.item) {
+			imageContainer.removeChildren();
+			PIXI.Texture.fromURL(arg.item.image).then(bgTexture => {
+				imageTexture = bgTexture;
+				let imageSprite = new PIXI.Sprite(bgTexture);
+				imageContainer.addChild(imageSprite);
+				layout();
+			}).catch(error => {
+				console.warn(error);
+			});;
+		} else {
+			imageContainer.removeChildren();
+		}
+	});
 	ipcRenderer.on("updateSettings", (event, arg) => {
 		settings = arg;
 		const fontLoader = new FontFaceObserver(fontList, {weight: arg.fontWeight});
@@ -100,6 +120,7 @@ window.onload = function () {
 }
 
 function initPIXI() {
+	app.stage.addChild(imageContainer);
 	app.stage.addChild(subtitle);
 	app.ticker.add(() => {
 		if (lowerThirdAnimation.animating) {
@@ -222,6 +243,33 @@ function layout() {
 		}
 		
 		lowerThird.y = h - (lowerThirdTexture.height + margin);
+	}
+
+	if (imageContainer) {
+		const imageAspectRatio = imageTexture.width / imageTexture.height;
+		if (imageAspectRatio > 1 && imageTexture.width > w * settings.imageMaxSize) {
+			imageContainer.width = w * settings.imageMaxSize;
+			imageContainer.height = imageContainer.width / imageAspectRatio;
+		} else if (imageTexture.height > h * settings.imageMaxSize) {
+			imageContainer.height = h * settings.imageMaxSize;
+			imageContainer.width = imageContainer.height * imageAspectRatio;
+		}
+
+		imageContainer.x = margin;
+		imageContainer.y = h - imageContainer.height - margin;
+
+		if (settings.imageAlign == "bottomRight") {
+			imageContainer.x = w - imageContainer.width - margin;
+		} else if (settings.imageAlign == "topLeft") {
+			imageContainer.y = margin;
+		} else if (settings.imageAlign == "topRight") {
+			imageContainer.y = margin;
+			imageContainer.x = w - imageContainer.width - margin;
+		} else if (settings.imageAlign == "center") {
+			imageContainer.x = (w - imageContainer.width) / 2;
+			imageContainer.y = (h - imageContainer.height) / 2;
+		}
+		
 	}
 }
 

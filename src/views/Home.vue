@@ -39,6 +39,22 @@
           </el-form-item>
         </el-form>
       </el-tab-pane>
+      <el-tab-pane label="Images" name="images">
+        <el-form label-position="right" label-width="130px">
+          <el-form-item label="Align">
+            <el-select v-model="settings.imageAlign" @change="update">
+              <el-option label="bottomLeft" value="bottomLeft"></el-option>
+              <el-option label="bottomRight" value="bottomRight"></el-option>
+              <el-option label="topLeft" value="topLeft"></el-option>
+              <el-option label="topRight" value="topRight"></el-option>
+              <el-option label="center" value="center"></el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="Max Size %">
+            <el-input-number v-model="settings.imageMaxSize" @change="update" :min="0.1" :max="1" :step="0.1"></el-input-number>
+          </el-form-item>
+        </el-form>
+      </el-tab-pane>
     </el-tabs>
   </div>
 </template>

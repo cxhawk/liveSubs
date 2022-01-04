@@ -111,7 +111,7 @@
         >
       </span>
     </el-dialog>
-		<el-dialog title="Item" :visible.sync="isEditing" width="70%" v-if="isEditing" :close-on-click-modal="false">
+		<el-dialog title="Edit" :visible.sync="isEditing" width="70%" v-if="isEditing" :close-on-click-modal="false">
       <el-input
         placeholder="title"
         v-model="editingItem.title"

@@ -11,6 +11,7 @@ let hideAllCSSKey = null
 let muted = false
 let currentSubtitle = null
 let currentLowerThird = null
+let currentImage = null
 
 // Scheme must be registered before the app is ready
 protocol.registerSchemesAsPrivileged([
@@ -36,6 +37,19 @@ ipcMain.handle("openImage", () => {
     title: "Open background image file",
     filters: [
       { name: 'Images', extensions: ['jpg', 'png'] }
+    ]
+  });
+})
+
+ipcMain.handle("openImages", () => {
+  return dialog.showOpenDialogSync({
+    title: "Open image files",
+    filters: [
+      { name: 'Images', extensions: ['jpg', 'png'] }
+    ],
+    buttonLabel: "Locate",
+    properties: [
+      "multiSelections", "openFile"
     ]
   });
 })
@@ -98,6 +112,7 @@ async function showProjection(settings) {
       setTimeout(() => {
         showSubtitle(currentSubtitle)
         showLowerThird(currentLowerThird)
+        showImage(currentImage)
       }, 500)
 
       projectionWindow.show()
@@ -129,9 +144,19 @@ async function showLowerThird(item) {
   currentLowerThird = item
 }
 
+ipcMain.on("showImage", (event, arg) => {
+  showImage(arg)
+})
+
+async function showImage(item) {
+  if (projectionWindow) {
+    projectionWindow.webContents.send("showImage", item)
+  }
+  currentImage = item
+}
+
 ipcMain.on("updateSettings", (event, arg) => {
   if (projectionWindow) {
-    //console.log(arg)
     projectionWindow.setBackgroundColor(arg.backgroundColor)
     projectionWindow.webContents.send("updateSettings", arg)
   }
@@ -201,8 +226,9 @@ app.on('ready', async () => {
   }
 
   protocol.registerFileProtocol("atom", (request, callback) => {
-    const path = request.url.substr(7);
-    console.log(path);
+    let path = request.url.substr(7);
+    path = decodeURI(path)
+    //console.log(path);
     callback(path);
   })
 
