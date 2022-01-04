@@ -45,9 +45,9 @@ ipcMain.handle("openImages", () => {
   return dialog.showOpenDialogSync({
     title: "Open image files",
     filters: [
-      { name: 'Images', extensions: ['jpg', 'png'] }
+      { name: 'Images', extensions: ['jpg', 'png', 'webm', 'mov'] }
     ],
-    buttonLabel: "Locate",
+    buttonLabel: "Load",
     properties: [
       "multiSelections", "openFile"
     ]

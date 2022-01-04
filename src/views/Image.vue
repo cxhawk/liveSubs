@@ -25,10 +25,11 @@
       :current-row-key="currentImageId"
     >
       <el-table-column type="index" width="50"> </el-table-column>
-      <el-table-column label="Image">
+      <el-table-column label="Preview">
         <template slot-scope="scope">
-          <el-image :src="scope.row.image" fit="scale-down" style="height:250px"></el-image>
-         </template>
+          <video v-if="isVideo(scope.row.image)" :src="scope.row.image" controls autoplay loop style="height:250px"></video>
+          <el-image v-else :src="scope.row.image" fit="scale-down" style="height:250px"></el-image>
+        </template>
       </el-table-column>
       <el-table-column fixed="right" label="Action" width="100">
         <template slot-scope="scope">
@@ -42,7 +43,8 @@
     <el-dialog title="Add Image(s)" :visible.sync="importDialogVisible" width="70%" :close-on-click-modal="false">
       <el-form>
         <el-form-item v-for="url of importImageURLs" :key="url">
-          <el-image :src="'atom://' + url" fit="scale-down" style="height:250px"></el-image>
+          <video v-if="isVideo(url)" :src="'atom://' + url" controls autoplay loop style="height:250px"></video>
+          <el-image v-else :src="'atom://' + url" fit="scale-down" style="height:250px"></el-image>
         </el-form-item>
         <el-form-item><el-button icon="el-icon-folder-opened" @click="locateImages">Browse</el-button></el-form-item>
       </el-form>
@@ -167,6 +169,10 @@ export default {
           }
         }
       });
+    },
+    isVideo(url) {
+      const extension = url.split('.').pop().toLowerCase();
+      return extension == 'webm';
     }
   },
 };

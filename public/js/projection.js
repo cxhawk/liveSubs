@@ -82,15 +82,21 @@ window.onload = function () {
 	});
 	ipcRenderer.on("showImage", (event, arg) => {
 		if (arg && arg.item) {
+			const url = arg.item.image;
 			imageContainer.removeChildren();
-			PIXI.Texture.fromURL(arg.item.image).then(bgTexture => {
+			PIXI.Texture.fromURL(url).then(bgTexture => {
 				imageTexture = bgTexture;
 				let imageSprite = new PIXI.Sprite(bgTexture);
 				imageContainer.addChild(imageSprite);
 				layout();
+				if (isVideo(url)) {
+					const videoControler = imageTexture.baseTexture.resource.source;
+					console.log(videoControler);
+					videoControler.loop = true;
+				}
 			}).catch(error => {
 				console.warn(error);
-			});;
+			});
 		} else {
 			imageContainer.removeChildren();
 		}
@@ -245,7 +251,7 @@ function layout() {
 		lowerThird.y = h - (lowerThirdTexture.height + margin);
 	}
 
-	if (imageContainer) {
+	if (imageContainer && imageTexture) {
 		const imageAspectRatio = imageTexture.width / imageTexture.height;
 		if (imageAspectRatio > 1 && imageTexture.width > w * settings.imageMaxSize) {
 			imageContainer.width = w * settings.imageMaxSize;
@@ -271,6 +277,11 @@ function layout() {
 		}
 		
 	}
+}
+
+function isVideo(url) {
+	const extension = url.split('.').pop().toLowerCase();
+  return extension == 'webm';
 }
 
 window.onresize = layout;
