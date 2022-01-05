@@ -21,14 +21,17 @@ export default new Vuex.Store({
       strokeSize: 2,
       addShadow: false,
       centerAlign: true,
+      // image settings
       imageAlign: "bottomLeft",
       imageMaxSize: 0.5,
+      imageLoop: true,
     }, JSON.parse(localStorage.getItem("settings"))),
     currentSubtitleEpisodeId: null,
     currentSubtitleId: null,
     currentLowerThirdTemplateId: null,
     currentLowerThirdId: null,
-    currentImageId: null
+    currentImageId: null,
+    activeTab: "general"
   },
   getters: {
     // Add the `getField` getter to the

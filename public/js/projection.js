@@ -31,8 +31,10 @@ let settings = {
 	strokeSize: 2,
 	addShadow: false,
 	centerAlign: true,
+	// image settings
 	imageAlign: "bottomLeft",
 	imageMaxSize: 0.5,
+	imageLoop: true,
 	// lower third settings
 	templates: {}
 };
@@ -89,7 +91,7 @@ window.onload = function () {
 				let imageSprite = new PIXI.Sprite(bgTexture);
 				imageContainer.addChild(imageSprite);
 				layout();
-				if (isVideo(url)) {
+				if (isVideo(url) && settings.imageLoop) {
 					const videoControler = imageTexture.baseTexture.resource.source;
 					console.log(videoControler);
 					videoControler.loop = true;
@@ -274,7 +276,12 @@ function layout() {
 		} else if (settings.imageAlign == "center") {
 			imageContainer.x = (w - imageContainer.width) / 2;
 			imageContainer.y = (h - imageContainer.height) / 2;
-		}
+		} else if (settings.imageAlign == "topCenter") {
+			imageContainer.x = (w - imageContainer.width) / 2;
+			imageContainer.y = margin;
+		} else if (settings.imageAlign == "bottomCenter") {
+			imageContainer.x = (w - imageContainer.width) / 2;
+		} 
 		
 	}
 }
