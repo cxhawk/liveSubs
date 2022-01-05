@@ -7,7 +7,7 @@ Download binaries from the [release pages](https://github.com/cxhawk/liveSubs/re
 ## Features
 - Import subtitles by lines in a batch and go through them one by one
 - Design multiple lower third templates with background image and text format.
-- Put any picture on screen with the positions and sizes of your choice.
+- Put any picture or video on screen with the positions and sizes of your choice.
 - Use keyboard shortcut keys to control the display content.
 - Available on macOS, Windows and Raspbian.
 
@@ -23,10 +23,11 @@ Download binaries from the [release pages](https://github.com/cxhawk/liveSubs/re
 Create and design multiple lower third template
 <img width="1136" alt="Screen Shot 2021-09-19 at 4 02 46 PM" src="https://user-images.githubusercontent.com/14524765/133945727-2f82b4d8-8363-4694-930f-50eac09ca27d.png">
 
-
 Import subtitle lines in a batch and show them one by one by pressing the space bar
 <img width="1136" alt="Screen Shot 2021-09-19 at 4 03 35 PM" src="https://user-images.githubusercontent.com/14524765/133945744-b81d132f-bf54-449e-9d75-276b3b59d6c0.png">
 
+Image and video overlay
+<img width="1136" alt="Screen Shot 2022-01-04 at 5 10 51 PM" src="https://user-images.githubusercontent.com/14524765/148147918-0de89834-d95f-4a32-83de-6a23cf5208e1.png">
 
 subtitle on projection window
 <img width="2048" alt="Screen Shot 2021-09-17 at 3 04 57 PM" src="https://user-images.githubusercontent.com/14524765/133858578-d05cd3f0-98b7-41bd-b8da-e0263132f38b.png">
