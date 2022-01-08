@@ -76,7 +76,10 @@
                 </p>
               </el-menu-item>
             </el-submenu>
-            <el-menu-item index="/images"><i class="el-icon-picture-outline"></i>Images</el-menu-item>
+            <el-menu-item index="/images" :class="{activeItem: currentImageId != null}">
+              <i class="el-icon-picture-outline"></i>
+              <span slot="title">Image/Video</span>
+            </el-menu-item>
           </el-menu>
         </el-aside>
         <el-container>
@@ -111,6 +114,7 @@ export default {
       'currentSubtitleId',
       'currentLowerThirdTemplateId',
       'currentLowerThirdId',
+      'currentImageId'
     ]),
     currentSubtitleText() {
       return this.$store.getters.currentSubtitle ? this.$store.getters.currentSubtitle.text : null;
@@ -139,6 +143,9 @@ export default {
     })
     ipcRenderer.on("clearLowerThird", () => {
       this.$store.dispatch("showLowerThird", {templateId: null, itemId: null});
+    })
+    ipcRenderer.on("clearImage", () => {
+      this.$store.dispatch("showImage", {imageId: null});
     })
   },
   mounted() {

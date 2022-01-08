@@ -245,6 +245,9 @@ app.on('ready', async () => {
   globalShortcut.register('CommandOrControl+O', () => {
     mainWindow.webContents.send("showProjection")
   })
+  globalShortcut.register('CommandOrControl+3', () => {
+    mainWindow.webContents.send("clearImage")
+  })
   globalShortcut.register('CommandOrControl+2', () => {
     mainWindow.webContents.send("clearSubtitle")
   })

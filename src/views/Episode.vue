@@ -39,15 +39,15 @@
       <el-table-column prop="text" label="Text"> </el-table-column>
       <el-table-column fixed="right" label="Action" width="100">
         <template slot-scope="scope">
-          <el-button @click="insertLine(scope.row, $event)" type="text" size="small" icon="el-icon-s-unfold"
-            ></el-button
-          >
-          <el-button @click="editLine(scope.row, $event)" type="text" size="small" icon="el-icon-edit"
-            ></el-button
-          >
-          <el-button @click="removeLine(scope.row, $event)" type="text" size="small" icon="el-icon-delete"
-            ></el-button
-          >
+          <el-tooltip content="insert new item before this">
+            <el-button @click="insertLine(scope.row, $event)" type="text" size="small" icon="el-icon-s-unfold"></el-button>
+          </el-tooltip>
+          <el-tooltip content="edit this item">
+            <el-button @click="editLine(scope.row, $event)" type="text" size="small" icon="el-icon-edit"></el-button>
+          </el-tooltip>
+          <el-tooltip content="delete this item">
+            <el-button @click="removeLine(scope.row, $event)" type="text" size="small" icon="el-icon-delete"></el-button>
+          </el-tooltip>
         </template>
       </el-table-column>
     </el-table>
