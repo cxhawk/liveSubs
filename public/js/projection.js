@@ -89,12 +89,18 @@ window.onload = function () {
 			PIXI.Texture.fromURL(url).then(bgTexture => {
 				imageTexture = bgTexture;
 				let imageSprite = new PIXI.Sprite(bgTexture);
-				imageContainer.addChild(imageSprite);
-				layout();
-				if (isVideo(url) && settings.imageLoop) {
+				if (isVideo(url)) {
 					const videoControler = imageTexture.baseTexture.resource.source;
-					console.log(videoControler);
-					videoControler.loop = true;
+					videoControler.loop = settings.imageLoop;
+					videoControler.addEventListener('seeked', (event) => {
+						videoControler.play();
+						imageContainer.addChild(imageSprite);
+						layout();
+					});
+					videoControler.currentTime = 0;
+				} else {
+					imageContainer.addChild(imageSprite);
+					layout();
 				}
 			}).catch(error => {
 				console.warn(error);
@@ -255,7 +261,7 @@ function layout() {
 
 	if (imageContainer && imageTexture) {
 		const imageAspectRatio = imageTexture.width / imageTexture.height;
-		if (imageAspectRatio > 1 && imageTexture.width > w * settings.imageMaxSize) {
+		if (imageAspectRatio > w / h && imageTexture.width > w * settings.imageMaxSize) {
 			imageContainer.width = w * settings.imageMaxSize;
 			imageContainer.height = imageContainer.width / imageAspectRatio;
 		} else if (imageTexture.height > h * settings.imageMaxSize) {
@@ -288,7 +294,7 @@ function layout() {
 
 function isVideo(url) {
 	const extension = url.split('.').pop().toLowerCase();
-  return extension == 'webm';
+  return extension == 'webm' || extension == 'mp4';
 }
 
 window.onresize = layout;

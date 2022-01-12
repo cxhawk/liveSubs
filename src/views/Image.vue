@@ -178,7 +178,7 @@ export default {
     },
     isVideo(url) {
       const extension = url.split('.').pop().toLowerCase();
-      return extension == 'webm';
+      return extension == 'webm' || extension == 'mp4';
     }
   },
 };
