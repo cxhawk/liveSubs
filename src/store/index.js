@@ -24,7 +24,8 @@ export default new Vuex.Store({
       // image settings
       imageAlign: "bottomLeft",
       imageMaxSize: 0.5,
-      imageLoop: true,
+      imageLoop: false,
+      imageMargin: 50,
     }, JSON.parse(localStorage.getItem("settings"))),
     currentSubtitleEpisodeId: null,
     currentSubtitleId: null,

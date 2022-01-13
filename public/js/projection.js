@@ -34,7 +34,8 @@ let settings = {
 	// image settings
 	imageAlign: "bottomLeft",
 	imageMaxSize: 0.5,
-	imageLoop: true,
+	imageLoop: false,
+	imageMargin: 50,
 	// lower third settings
 	templates: {}
 };
@@ -89,19 +90,15 @@ window.onload = function () {
 			PIXI.Texture.fromURL(url).then(bgTexture => {
 				imageTexture = bgTexture;
 				let imageSprite = new PIXI.Sprite(bgTexture);
+				imageSprite.name = "image";
 				if (isVideo(url)) {
 					const videoControler = imageTexture.baseTexture.resource.source;
 					videoControler.loop = settings.imageLoop;
-					videoControler.addEventListener('seeked', (event) => {
-						videoControler.play();
-						imageContainer.addChild(imageSprite);
-						layout();
-					});
 					videoControler.currentTime = 0;
-				} else {
-					imageContainer.addChild(imageSprite);
-					layout();
+					videoControler.play();
 				}
+				imageContainer.addChild(imageSprite);
+				layout();
 			}).catch(error => {
 				console.warn(error);
 			});
@@ -214,7 +211,7 @@ function layout() {
 	const currentTemplate = settings.templates[currentLowerThirdTemplateId];
 	const w = window.innerWidth;
 	const h = window.innerHeight;
-	const margin = 50;
+	let margin = 50;
 
 	subtitle.y = h - margin - settings.fontSize;
 	if (settings.centerAlign) {
@@ -260,6 +257,7 @@ function layout() {
 	}
 
 	if (imageContainer && imageTexture) {
+		margin = settings.imageMargin;
 		const imageAspectRatio = imageTexture.width / imageTexture.height;
 		if (imageAspectRatio > w / h && imageTexture.width > w * settings.imageMaxSize) {
 			imageContainer.width = w * settings.imageMaxSize;

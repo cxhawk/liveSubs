@@ -58,6 +58,9 @@
           <el-form-item label="Loop for video">
             <el-switch v-model="settings.imageLoop" @change="update"></el-switch>
           </el-form-item>
+          <el-form-item label="Margin (px)">
+            <el-input-number v-model="settings.imageMargin" @change="update" :min="0" :max="100"></el-input-number>
+          </el-form-item>
         </el-form>
       </el-tab-pane>
     </el-tabs>
