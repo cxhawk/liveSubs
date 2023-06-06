@@ -8,8 +8,8 @@ module.exports = {
 				"afterSign": "build/provisioning/notarize.js",
 				mac: {
 					target: {
-						"target": "dmg",
-						"arch": "universal"
+						"target": "zip",
+						"arch": "universal",
 					},
 					"hardenedRuntime": true,
 					"provisioningProfile": "build/provisioning/LiveSubsDevIDApp.provisionprofile",
