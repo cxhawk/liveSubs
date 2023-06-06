@@ -30,7 +30,7 @@ let settings = {
 	strokeColor: "#000000",
 	strokeSize: 2,
 	addShadow: false,
-	centerAlign: true,
+	subtitleAlign: "bottomCenter",
 	// image settings
 	imageAlign: "bottomLeft",
 	imageMaxSize: 0.5,
@@ -214,12 +214,25 @@ function layout() {
 	let margin = 50;
 
 	subtitle.y = h - margin - settings.fontSize;
-	if (settings.centerAlign) {
+	if (settings.subtitleAlign == "bottomCenter") {
 		subtitle.x = w / 2;
 		subtitle.anchor.x = 0.5;
-	} else {
+	} else if (settings.subtitleAlign == "bottomLeft") {
 		subtitle.x = margin;
 		subtitle.anchor.x = 0;
+	} else if (settings.subtitleAlign == "center") {
+		subtitle.x = w / 2;
+		subtitle.anchor.x = 0.5;
+		subtitle.anchor.y = 0.5;
+		subtitle.y = h / 2;
+	} else if (settings.subtitleAlign == "topLeft") {
+		subtitle.x = margin;
+		subtitle.anchor.x = 0;
+		subtitle.y = margin;
+	} else if (settings.subtitleAlign == "topCenter") {
+		subtitle.x = w / 2;
+		subtitle.anchor.x = 0.5;
+		subtitle.y = margin;
 	}
 
 	if (lowerThirdBg1 && currentTemplate) {

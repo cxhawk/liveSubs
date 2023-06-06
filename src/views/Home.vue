@@ -34,8 +34,14 @@
           <el-form-item label="Shadow">
             <el-switch v-model="settings.addShadow" @change="update"></el-switch>
           </el-form-item>
-          <el-form-item label="Center">
-            <el-switch v-model="settings.centerAlign" @change="update"></el-switch>
+          <el-form-item label="Position">
+            <el-select v-model="settings.subtitleAlign" @change="update">
+              <el-option label="top left" value="topLeft"></el-option>
+              <el-option label="top center" value="topCenter"></el-option>
+              <el-option label="center" value="center"></el-option>
+              <el-option label="bottom left" value="bottomLeft"></el-option>
+              <el-option label="bottom center" value="bottomCenter"></el-option>
+            </el-select>
           </el-form-item>
         </el-form>
       </el-tab-pane>

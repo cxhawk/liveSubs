@@ -20,7 +20,7 @@ export default new Vuex.Store({
       strokeColor: "#000000",
       strokeSize: 2,
       addShadow: false,
-      centerAlign: true,
+      subtitleAlign: "bottomCenter",
       // image settings
       imageAlign: "bottomLeft",
       imageMaxSize: 0.5,

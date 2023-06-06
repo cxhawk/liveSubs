@@ -99,7 +99,7 @@
       <el-input
         type="textarea"
         :autosize="{ minRows: 5, maxRows: 20 }"
-        placeholder="one line per title|description"
+        placeholder="one line per title and description (use space between title and description)"
         v-model="importText"
       ></el-input>
       <span slot="footer" class="dialog-footer">
@@ -182,7 +182,7 @@ export default {
         if (lines.length) {
           let newItems = [];
           for (const line of lines) {
-            const elements = line.split("|");
+            const elements = line.split(" ");
             if (elements.length >= 2) {
               newItems.push({ id: nanoid(), title: elements[0].trim(), description: elements[1].trim() });
             } else {
