@@ -124,6 +124,8 @@ window.onload = function () {
 				dropShadowColor: arg.strokeColor,
 				dropShadowDistance: arg.strokeSize,
 				fill: arg.color,
+				align: "center",
+				breakWords: true,
 			};
 			updateLowerThird();
 		});
@@ -213,26 +215,35 @@ function layout() {
 	const h = window.innerHeight;
 	let margin = 50;
 
-	subtitle.y = h - margin - settings.fontSize;
+	subtitle.anchor.y = 0;
+	subtitle.anchor.x = 0;
+	subtitle.style.wordWrapWidth = w - margin;
 	if (settings.subtitleAlign == "bottomCenter") {
 		subtitle.x = w / 2;
+		subtitle.y = h - margin - settings.fontSize;
 		subtitle.anchor.x = 0.5;
+		subtitle.anchor.y = 0.5;
+		subtitle.style.wordWrap = true;
 	} else if (settings.subtitleAlign == "bottomLeft") {
 		subtitle.x = margin;
-		subtitle.anchor.x = 0;
+		subtitle.y = h - margin - settings.fontSize;
+		subtitle.anchor.y = 0.5;
+		subtitle.style.wordWrap = false;
 	} else if (settings.subtitleAlign == "center") {
 		subtitle.x = w / 2;
 		subtitle.anchor.x = 0.5;
 		subtitle.anchor.y = 0.5;
 		subtitle.y = h / 2;
+		subtitle.style.wordWrap = true;
 	} else if (settings.subtitleAlign == "topLeft") {
 		subtitle.x = margin;
-		subtitle.anchor.x = 0;
 		subtitle.y = margin;
+		subtitle.style.wordWrap = false;
 	} else if (settings.subtitleAlign == "topCenter") {
 		subtitle.x = w / 2;
 		subtitle.anchor.x = 0.5;
 		subtitle.y = margin;
+		subtitle.style.wordWrap = true;
 	}
 
 	if (lowerThirdBg1 && currentTemplate) {

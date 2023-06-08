@@ -11,7 +11,7 @@
       <el-tab-pane label="Subtitle" name="sub">
         <el-form label-position="right" label-width="130px">
           <el-form-item label="Size">
-            <el-input-number v-model="settings.fontSize" @change="update" :min="10" :max="100"></el-input-number>
+            <el-input-number v-model="settings.fontSize" @change="update" :min="10" :max="500"></el-input-number>
           </el-form-item>
           <el-form-item label="Weight">
             <el-select v-model="settings.fontWeight" @change="update">
