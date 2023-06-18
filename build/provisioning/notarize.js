@@ -1,13 +1,13 @@
 const fs = require('fs');
 const path = require('path');
-var electron_notarize = require('electron-notarize');
+var electron_notarize = require('@electron/notarize');
 
 module.exports = async function (params) {
   // Only notarize the app on Mac OS only.
   if (process.platform !== 'darwin') {
     return;
   }
-  console.log('afterSign hook triggered', params);
+  console.log('afterSign hook triggered');
 
   // Same appId in electron-builder.
   let appId = 'com.maizesoft.livesubs'
@@ -21,12 +21,11 @@ module.exports = async function (params) {
 
   try {
     await electron_notarize.notarize({
-      appBundleId: appId,
+      tool: "notarytool",
       appPath: appPath,
       appleId: "cxhawk@gmail.com",
-      //security add-generic-password -a "appleid@email.com" -w <app_specific_password> -s "AC_PASSWORD"
       appleIdPassword: "@keychain:AC_PASSWORD", 
-      ascProvider: "XiangCao191131129"
+      teamId: "UD64FZRZ5H"
     });
   } catch (error) {
     console.error(error);
