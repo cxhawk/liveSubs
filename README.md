@@ -36,8 +36,9 @@ default lower third on projection window
 <img width="2048" alt="Screen Shot 2021-09-17 at 3 05 15 PM" src="https://user-images.githubusercontent.com/14524765/133858584-5293eb18-251a-48b0-8139-6a3eba07430c.png">
 
 ## Compile from sources
-This project is based on Electron + ElementUI + PIXI. Make sure you have nodejs v14 installed and then run:
+This project is based on Electron + ElementUI + PIXI. Make sure you have nodejs v14 (required) installed and then run:
 ```
+nvm use
 npm install
 ```
 Compiles and hot-reloads for development
