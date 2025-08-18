@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import { getField, updateField } from 'vuex-map-fields';
+import chineseConverter from '../utils/chineseConverter';
 const { ipcRenderer } = window.require('electron');
 
 Vue.use(Vuex)
@@ -13,7 +14,7 @@ export default new Vuex.Store({
     settings: Object.assign({
       backgroundColor: "#009933",
       // subtitle settings
-      fontFamily: "Noto Sans SC",
+      fontFamily: "Alibaba PuHuiTi 2.0",
       fontSize: 50,
       fontWeight: "700",
       color: "#FFFFFF",
@@ -21,11 +22,15 @@ export default new Vuex.Store({
       strokeSize: 2,
       addShadow: false,
       subtitleAlign: "bottomCenter",
+      // chinese conversion settings
+      chineseConversion: "none", // "none", "s2t", "t2s"
       // image settings
       imageAlign: "bottomLeft",
       imageMaxSize: 0.5,
       imageLoop: false,
       imageMargin: 50,
+      // subtitle export settings
+      subtitleExportPath: require('os').homedir() + '/Documents',
     }, JSON.parse(localStorage.getItem("settings"))),
     currentSubtitleEpisodeId: null,
     currentSubtitleId: null,
@@ -80,20 +85,46 @@ export default new Vuex.Store({
     showSubtitle(context, {episodeId, lyricsId}) {
       context.state.currentSubtitleEpisodeId = episodeId;
       context.state.currentSubtitleId = lyricsId;
-      ipcRenderer.send("showSubtitle", context.getters.currentSubtitle);
+      const subtitle = context.getters.currentSubtitle;
+      if (subtitle && subtitle.text) {
+        const convertedSubtitle = {
+          ...subtitle,
+          text: chineseConverter.convert(subtitle.text, context.state.settings.chineseConversion)
+        };
+        ipcRenderer.send("showSubtitle", convertedSubtitle);
+      } else {
+        ipcRenderer.send("showSubtitle", subtitle);
+      }
     },
     showLowerThird(context, {templateId, itemId}) {
       context.state.currentLowerThirdTemplateId = templateId;
       context.state.currentLowerThirdId = itemId;
-      ipcRenderer.send("showLowerThird", {templateId: templateId, item: context.getters.currentLowerThird});
+      const lowerThird = context.getters.currentLowerThird;
+      if (lowerThird && (lowerThird.title || lowerThird.description)) {
+        const convertedLowerThird = {
+          ...lowerThird,
+          title: lowerThird.title ? chineseConverter.convert(lowerThird.title, context.state.settings.chineseConversion) : lowerThird.title,
+          description: lowerThird.description ? chineseConverter.convert(lowerThird.description, context.state.settings.chineseConversion) : lowerThird.description
+        };
+        ipcRenderer.send("showLowerThird", {templateId: templateId, item: convertedLowerThird});
+      } else {
+        ipcRenderer.send("showLowerThird", {templateId: templateId, item: lowerThird});
+      }
     },
     showImage(context, {imageId}) {
       context.state.currentImageId = imageId;
       const currentImage = context.state.images.find((item) => item.id === imageId);
       ipcRenderer.send("showImage", {item: currentImage});
     },
-    previousSubtitle(context) {
-      const currentEpisode = context.state.episodes.find((ep) => ep.id === context.state.currentSubtitleEpisodeId);
+    previousSubtitle(context, routeEpisodeId = null) {
+      // Try to find current episode from state first, then from route parameter
+      let currentEpisode = context.state.episodes.find((ep) => ep.id === context.state.currentSubtitleEpisodeId);
+      
+      // If no current episode in state, use the route episode ID
+      if (!currentEpisode && routeEpisodeId) {
+        currentEpisode = context.state.episodes.find((ep) => ep.id === routeEpisodeId);
+      }
+      
       if (currentEpisode) {
         const lyricsIndex = currentEpisode.lyrics.findIndex((element) => element.id === context.state.currentSubtitleId);
         if (lyricsIndex > 0) {
@@ -103,11 +134,18 @@ export default new Vuex.Store({
         }
       }
     },
-    nextSubtitle(context) {
-      const currentEpisode = context.state.episodes.find((ep) => ep.id === context.state.currentSubtitleEpisodeId);
+    nextSubtitle(context, routeEpisodeId = null) {
+      // Try to find current episode from state first, then from route parameter
+      let currentEpisode = context.state.episodes.find((ep) => ep.id === context.state.currentSubtitleEpisodeId);
+      
+      // If no current episode in state, use the route episode ID
+      if (!currentEpisode && routeEpisodeId) {
+        currentEpisode = context.state.episodes.find((ep) => ep.id === routeEpisodeId);
+      }
+      
       if (currentEpisode) {
         const lyricsIndex = currentEpisode.lyrics.findIndex((element) => element.id === context.state.currentSubtitleId);
-        console.log(lyricsIndex);
+        
         if (lyricsIndex >= 0) {
           if (lyricsIndex < currentEpisode.lyrics.length - 1) {
             context.dispatch("showSubtitle", {episodeId: currentEpisode.id, lyricsId: currentEpisode.lyrics[lyricsIndex + 1].id})
@@ -115,7 +153,10 @@ export default new Vuex.Store({
             context.dispatch("showSubtitle", {episodeId: currentEpisode.id, lyricsId: null})
           }
         } else {
-          context.dispatch("showSubtitle", {episodeId: currentEpisode.id, lyricsId: currentEpisode.lyrics[0].id});
+          // No current subtitle selected, start with first one
+          if (currentEpisode.lyrics.length > 0) {
+            context.dispatch("showSubtitle", {episodeId: currentEpisode.id, lyricsId: currentEpisode.lyrics[0].id});
+          }
         }
       }
     }

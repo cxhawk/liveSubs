@@ -19,11 +19,11 @@ let lowerThirdAnimation = {animating: false, startTime: 0};
 let imageContainer = new PIXI.Container();
 let imageTexture = null;
 
-const fontList = "Alibaba PuHuiTi 2.0";
+const defaultFont = "Alibaba PuHuiTi 2.0";
 let settings = {
 	backgroundColor: "#009933",
 	// subtitle settings
-	fontFamily: fontList,
+	fontFamily: defaultFont,
 	fontSize: 50,
 	fontWeight: "700",
 	color: "#FFFFFF",
@@ -108,14 +108,15 @@ window.onload = function () {
 	});
 	ipcRenderer.on("updateSettings", (event, arg) => {
 		settings = arg;
-		const fontLoader = new FontFaceObserver(fontList, {weight: arg.fontWeight});
+		const fontToUse = arg.fontFamily || defaultFont;
+		const fontLoader = new FontFaceObserver(fontToUse, {weight: arg.fontWeight});
 		fontLoader.load().then(() => {
 
 		}).catch(() => {
-			console.log("unable to load font: " + fontList);
+			console.log("unable to load font: " + fontToUse);
 		}).finally(() => {
 			subtitle.style = {
-				fontFamily: fontList, 
+				fontFamily: fontToUse, 
 				fontSize: arg.fontSize,
 				fontWeight: arg.fontWeight,
 				stroke: arg.strokeColor,
@@ -157,17 +158,18 @@ function updateLowerThird() {
 	const currentTemplate = settings.templates[currentLowerThirdTemplateId];
 
 	if (currentTemplate) {
-		const fontLoader1 = new FontFaceObserver(fontList, {weight: 700});
-		const fontLoader2 = new FontFaceObserver(fontList, {weight: 300});
+		const fontToUse = settings.fontFamily || defaultFont;
+		const fontLoader1 = new FontFaceObserver(fontToUse, {weight: 700});
+		const fontLoader2 = new FontFaceObserver(fontToUse, {weight: 300});
 		Promise.all([fontLoader1.load(), fontLoader2.load()]).finally(() => {
 			lowerThirdHeader.style = {
-				fontFamily: fontList, 
+				fontFamily: fontToUse, 
 				fontSize: currentTemplate.lowerThirdTitleFontSize,
 				fontWeight: 700,
 				fill: currentTemplate.lowerThirdTitleColor, 
 			};
 			lowerThirdDescription.style = {
-				fontFamily: fontList, 
+				fontFamily: fontToUse, 
 				fontSize: currentTemplate.lowerThirdDescriptionFontSize,
 				fontWeight: 300,
 				fill: currentTemplate.lowerThirdDescriptionColor,

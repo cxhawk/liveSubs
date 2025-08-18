@@ -1,6 +1,6 @@
 'use strict'
 
-import { app, protocol, BrowserWindow, screen, globalShortcut, dialog } from 'electron'
+import { app, protocol, BrowserWindow, screen, globalShortcut, dialog, shell } from 'electron'
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
 import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer'
 const { ipcMain } = require('electron')
@@ -12,6 +12,7 @@ let muted = false
 let currentSubtitle = null
 let currentLowerThird = null
 let currentImage = null
+let isProjectionFullscreen = false
 
 // Scheme must be registered before the app is ready
 protocol.registerSchemesAsPrivileged([
@@ -26,6 +27,22 @@ require('update-electron-app')({
 
 ipcMain.on("showProjection", (event, arg) => {
   showProjection(arg)
+})
+
+ipcMain.on("closeProjection", () => {
+  closeProjection()
+})
+
+ipcMain.on("projectAtMax", (event, arg) => {
+  projectAtMax(arg)
+})
+
+ipcMain.on("toggleProjectionFullscreen", (event, arg) => {
+  toggleProjectionFullscreen(arg)
+})
+
+ipcMain.on("openExternal", (event, url) => {
+  shell.openExternal(url)
 })
 
 ipcMain.handle("mute", () => {
@@ -52,6 +69,48 @@ ipcMain.handle("openImages", () => {
       "multiSelections", "openFile"
     ]
   });
+})
+
+ipcMain.handle("selectSubtitleFolder", () => {
+  return dialog.showOpenDialog({
+    title: "Select folder to save subtitle files",
+    buttonLabel: "Select Folder",
+    properties: ["openDirectory", "createDirectory"]
+  });
+})
+
+ipcMain.handle("saveSubtitleFile", async (event, { filePath, content }) => {
+  const fs = require('fs').promises;
+  try {
+    await fs.writeFile(filePath, content, 'utf8');
+    return { success: true };
+  } catch (error) {
+    console.error('Error saving subtitle file:', error);
+    return { success: false, error: error.message };
+  }
+})
+
+ipcMain.handle("selectTxtFile", () => {
+  return dialog.showOpenDialog({
+    title: "Select subtitle file to import",
+    buttonLabel: "Import",
+    filters: [
+      { name: 'Text Files', extensions: ['txt'] },
+      { name: 'All Files', extensions: ['*'] }
+    ],
+    properties: ["openFile"]
+  });
+})
+
+ipcMain.handle("readTxtFile", async (event, filePath) => {
+  const fs = require('fs').promises;
+  try {
+    const content = await fs.readFile(filePath, 'utf8');
+    return { success: true, content: content };
+  } catch (error) {
+    console.error('Error reading file:', error);
+    return { success: false, error: error.message };
+  }
 })
 
 async function toggleHideAll() {
@@ -87,6 +146,11 @@ async function showProjection(settings) {
     projectionWindow.on("closed", () => {
       projectionWindow = null
       hideAllCSSKey = null
+      isProjectionFullscreen = false
+      if (mainWindow) {
+        mainWindow.webContents.send("projectionWindowClosed");
+        mainWindow.webContents.send("projectionFullscreenChanged", false);
+      }
     })
     if (process.env.WEBPACK_DEV_SERVER_URL) {
       projectionWindow.loadURL(process.env.WEBPACK_DEV_SERVER_URL + 'projection.html')
@@ -94,15 +158,11 @@ async function showProjection(settings) {
       projectionWindow.loadURL('app://./projection.html')
     }
     projectionWindow.on("ready-to-show", () => {
-      for (const display of screen.getAllDisplays()) {
-        if (display.size.width === 1920 && display.size.height === 1080) {
-          if (display.id != screen.getPrimaryDisplay().id) {
-            console.log(display);
-            projectionWindow.setPosition(display.workArea.x, display.workArea.y);
-            projectionWindow.setFullScreen(true);
-            break;
-          }
-        }
+      // Use smart display selection for initial positioning
+      const bestExternalDisplay = findBestExternalDisplay()
+      if (bestExternalDisplay) {
+        // Position on best external display but don't go fullscreen initially
+        projectionWindow.setPosition(bestExternalDisplay.workArea.x, bestExternalDisplay.workArea.y);
       }
       // restore states
       projectionWindow.webContents.send("updateSettings", settings);
@@ -116,9 +176,115 @@ async function showProjection(settings) {
       }, 500)
 
       projectionWindow.show()
+      if (mainWindow) {
+        mainWindow.webContents.send("projectionWindowOpened");
+      }
     })
   } else {
     projectionWindow.show()
+    if (mainWindow) {
+      mainWindow.webContents.send("projectionWindowOpened");
+    }
+  }
+}
+
+function closeProjection() {
+  if (projectionWindow) {
+    projectionWindow.close()
+  }
+}
+
+function findBestExternalDisplay() {
+  const primaryDisplay = screen.getPrimaryDisplay();
+  const externalDisplays = screen.getAllDisplays().filter(display => display.id !== primaryDisplay.id);
+  
+  if (externalDisplays.length === 0) return null;
+  if (externalDisplays.length === 1) return externalDisplays[0];
+  
+  // Priority order for multiple external displays:
+  // 1. Largest resolution (4K > 1080p > others)
+  // 2. Rightmost position (typical projector setup)
+  // 3. First detected external display
+  
+  return externalDisplays.sort((a, b) => {
+    // Sort by resolution (area), then by x position
+    const areaA = a.size.width * a.size.height;
+    const areaB = b.size.width * b.size.height;
+    if (areaA !== areaB) return areaB - areaA; // Larger first
+    return b.bounds.x - a.bounds.x; // Rightmost first
+  })[0];
+}
+
+async function toggleProjectionFullscreen(settings) {
+  // If no projection window exists, create one first
+  if (projectionWindow === null) {
+    await showProjection(settings)
+  }
+  
+  if (projectionWindow) {
+    if (isProjectionFullscreen) {
+      // Exit fullscreen and restore to normal window
+      projectionWindow.setFullScreen(false)
+      projectionWindow.setSize(800, 600)
+      projectionWindow.center()
+      isProjectionFullscreen = false
+      
+      if (mainWindow) {
+        mainWindow.webContents.send("projectionFullscreenChanged", false)
+      }
+    } else {
+      // Enter fullscreen mode with smart display selection
+      const bestExternalDisplay = findBestExternalDisplay()
+      
+      if (bestExternalDisplay) {
+        // Move to best external display and go full screen
+        projectionWindow.setPosition(bestExternalDisplay.bounds.x, bestExternalDisplay.bounds.y)
+        projectionWindow.setFullScreen(true)
+        projectionWindow.show()
+      } else {
+        // No external display found, just go full screen on primary display
+        projectionWindow.setFullScreen(true)
+        projectionWindow.show()
+      }
+      
+      isProjectionFullscreen = true
+      
+      if (mainWindow) {
+        mainWindow.webContents.send("projectionFullscreenChanged", true)
+        mainWindow.webContents.send("projectionWindowOpened")
+      }
+    }
+  }
+}
+
+async function projectAtMax(settings) {
+  // If no projection window exists, create one first
+  if (projectionWindow === null) {
+    await showProjection(settings)
+  }
+  
+  if (projectionWindow) {
+    // Use smart display selection for multiple external displays
+    const bestExternalDisplay = findBestExternalDisplay()
+    
+    if (bestExternalDisplay) {
+      // Move to best external display and go full screen
+      projectionWindow.setPosition(bestExternalDisplay.bounds.x, bestExternalDisplay.bounds.y)
+      projectionWindow.setFullScreen(true)
+      projectionWindow.show()
+      
+      if (mainWindow) {
+        mainWindow.webContents.send("projectionWindowOpened")
+      }
+    } else {
+      // No external display found, just go full screen on primary display
+      projectionWindow.setFullScreen(true)
+      projectionWindow.show()
+      
+      if (mainWindow) {
+        mainWindow.webContents.send("projectionWindowOpened")
+      }
+    }
   }
 }
 
@@ -184,6 +350,13 @@ async function createWindow() {
 
   mainWindow.on("ready-to-show", () => {
     mainWindow.show()
+  })
+
+  mainWindow.on("closed", () => {
+    if (projectionWindow) {
+      projectionWindow.close()
+    }
+    mainWindow = null
   })
 
   if (process.env.WEBPACK_DEV_SERVER_URL) {
@@ -253,6 +426,17 @@ app.on('ready', async () => {
   })
   globalShortcut.register('CommandOrControl+1', () => {
     mainWindow.webContents.send("clearLowerThird")
+  })
+  globalShortcut.register('CommandOrControl+,', () => {
+    mainWindow.webContents.send("openPreferences")
+  })
+  globalShortcut.register('CommandOrControl+P', () => {
+    mainWindow.webContents.send("projectAtMax")
+  })
+  globalShortcut.register('CommandOrControl+C', () => {
+    if (projectionWindow) {
+      projectionWindow.close()
+    }
   })
 
   createWindow()

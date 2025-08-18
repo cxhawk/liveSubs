@@ -2,6 +2,7 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Home from '../views/Home.vue'
 import Image from '../views/Image.vue'
+import Preferences from '../views/Preferences.vue'
 
 Vue.use(VueRouter)
 
@@ -15,6 +16,11 @@ const routes = [
     path: '/images',
     name: 'Image',
     component: Image
+  },
+  {
+    path: '/preferences',
+    name: 'Preferences',
+    component: Preferences
   },
   {
     path: '/episode/:id',
